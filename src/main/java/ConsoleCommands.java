@@ -126,14 +126,14 @@ public class ConsoleCommands {
             finish = enterPoint(true);
             ConsoleOutput.unloggedMessage("Number of points: ");
             numpoints = enterInt();
-            points = new Point[numpoints+1];
+            points = new Point[numpoints + 1];
             ConsoleOutput.unloggedMessage("Delay(ms): ");
             delay = enterInt();
             if (start.getWavelenght() > finish.getWavelenght()) direction = -1;
             scanstep = Math.abs(finish.getWavelenght() - start.getWavelenght()) / numpoints;
             Dataset scan = new Dataset(points, new Date(), delay, scanstep);
             for (int i = 0; i <= numpoints; i++) {
-                points[i]=scanPoint(start.getWavelenght() + (scanstep * i * direction), delay);
+                points[i] = scanPoint(start.getWavelenght() + (scanstep * i * direction), delay);
             }
             scan.setFinishtime(new Date());
             ConsoleOutput.serviceMessage("Scan finished");
@@ -145,10 +145,9 @@ public class ConsoleCommands {
         }
     } //Start scaning procedure
 
-    private Point scanPoint(double nm, int delay) throws InterruptedException
-    {
+    private Point scanPoint(double nm, int delay) throws InterruptedException {
         int p = calibration.positionCalc(nm);
-        Point  point = new Point(p, nm);
+        Point point = new Point(p, nm);
         sendMotorCommand(engineCommands.moveTo(p));
         waitMoving();
         Thread.sleep(delay);

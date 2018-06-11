@@ -56,7 +56,7 @@ public class Connection {
 
         port.addEventListener(portreader, SerialPort.MASK_RXCHAR);
         status = true;
-       ConsoleOutput.serviceMessage("Connected to " + portname);
+        ConsoleOutput.serviceMessage("Connected to " + portname);
 
     }
 
@@ -129,11 +129,9 @@ public class Connection {
 
         public void serialEvent(SerialPortEvent event) {
             if (event.isRXCHAR() && event.getEventValue() > 0) {
-                try
-                {
+                try {
                     list.addLast(port.readString(event.getEventValue()));
-                } catch (SerialPortException e1)
-                {
+                } catch (SerialPortException e1) {
                     System.out.println(e1);
                 }
             }
@@ -143,18 +141,15 @@ public class Connection {
             return 0;
         }
 
-        public String readString()
-        {
+        public String readString() {
             String message = "";
-            while(list.size()>0)
-            {
-                message+=list.poll();
+            while (list.size() > 0) {
+                message += list.poll();
             }
             return message;
         }
 
-        public int getInputSize()
-        {
+        public int getInputSize() {
             return list.size();
         }
     }

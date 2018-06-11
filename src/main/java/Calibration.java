@@ -16,17 +16,6 @@ All these parameters - result of MANUAL device calibration(!!!)
     private double maxswave = 1081.6; //max saferange nm
     private double minswave = -6.1;  //min saferange nm
 
-    private boolean motorstatus; //fasle - free, ture - busy;
-
-    public boolean isMotorstatus()
-    {
-        return motorstatus;
-    }
-
-    public void setMotorstatus(boolean motorstatus) {
-        this.motorstatus = motorstatus;
-    }
-
     public int getMinwstep() {
         return minwstep;
     }
@@ -39,14 +28,14 @@ All these parameters - result of MANUAL device calibration(!!!)
     {
         int maxstep;
         int minstep;
-        if(increaserange) {
+        if (increaserange) {
             maxstep = maxsstep;
             minstep = minsstep;
         } else {
             maxstep = maxwstep;
             minstep = minwstep;
         }
-        if(step>=maxstep || step <=minstep) return false;
+        if (step >= maxstep || step <= minstep) return false;
         return true;
     }
 
@@ -54,7 +43,7 @@ All these parameters - result of MANUAL device calibration(!!!)
     {
         int maxstep;
         int minstep;
-        if(increaserange) {
+        if (increaserange) {
             maxstep = maxsstep;
             minstep = minsstep;
         } else {
@@ -62,31 +51,33 @@ All these parameters - result of MANUAL device calibration(!!!)
             minstep = minwstep;
         }
         int step = positionCalc(wavelenght);
-        if(step>=maxstep || step <=minstep) return false;
+        if (step >= maxstep || step <= minstep) return false;
         return true;
     }
 
     public double wavelenghtCalc(int position) //recalc steps position to nm
     {
         double wavelenght;
-        double a = position- minwstep;
+        double a = position - minwstep;
         double b = minwwave - maxwwave;
         double c = maxwstep - minwstep;
-        wavelenght = (a*b/c)+maxwwave;
+        wavelenght = (a * b / c) + maxwwave;
         return wavelenght;
     }
-    public int positionCalc (double wavelenght) //recalc nm position to steps
+
+    public int positionCalc(double wavelenght) //recalc nm position to steps
     {
         double position;
-        double a = wavelenght- maxwwave;
+        double a = wavelenght - maxwwave;
         double b = maxwstep - minwstep;
         double c = minwwave - maxwwave;
-        position = (a*b/c)+minwstep;
+        position = (a * b / c) + minwstep;
         return (int) position;
     }
+
     public boolean speedLimit(int speed) //check that speed value in limits
     {
-        if(speed>2047 || speed<0) return false;
+        if (speed > 2047 || speed < 0) return false;
         return true;
     }
 }

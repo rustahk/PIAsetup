@@ -40,6 +40,7 @@ public class EngineCommands {
         int command_number = 0x06; //Number from the motor manual
         return createCommand(command_number, 1, 0);
     }
+
     public int[] setPosition(int position) //set axis parameter position
     {
         int command_number = 0x05; //Number from the motor manual
@@ -48,7 +49,7 @@ public class EngineCommands {
 
     private byte calcChecksum(int[] message) {
         int checksumReal = 0;
-        message[8]=0; //set calcChecksum byte to zero
+        message[8] = 0; //set calcChecksum byte to zero
         for (int i : message) {
             checksumReal += i;
         }
@@ -70,17 +71,16 @@ public class EngineCommands {
         int a;
         int b = 2147483647;
         int c;
-        if(reply[4]<0)
-        {
-            reply[4]-=128;
+        if (reply[4] < 0) {
+            reply[4] -= 128;
             minus = true;
         }
         for (int i = 4; i < 8; i++) {
-            value+= String.format("%02X", (byte) reply[i]);
+            value += String.format("%02X", (byte) reply[i]);
         }
         if (!minus) return Integer.parseInt(value, 16);
-        c=b-Integer.parseInt(value, 16);
-        return (c+1)*-1;
+        c = b - Integer.parseInt(value, 16);
+        return (c + 1) * -1;
     }
 
     private int[] commandTemplate() {
@@ -102,11 +102,12 @@ public class EngineCommands {
     public boolean commandStatus(int[] command, int[] reply) //check reply  & return ture if it is correct
     {
         //checklist
-        if(reply[8]!= calcChecksum(reply)) return false; //calcChecksum byte
-        if(reply[2]!=100) return false; //status byte
-        if(command[1]!=reply[3]) return false; //command number byte
+        if (reply[8] != calcChecksum(reply)) return false; //calcChecksum byte
+        if (reply[2] != 100) return false; //status byte
+        if (command[1] != reply[3]) return false; //command number byte
         return true;
     }
+
     public int[] getSpeed() //get current speed of a motor
     {
         int command_number = 0x06; //Number from the motor manual

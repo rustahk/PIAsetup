@@ -1,5 +1,4 @@
-public class LockInCommands
-{
+public class LockInCommands {
 /*
 This class realize ASCII strings to Lock-In commands
 
@@ -7,24 +6,23 @@ There is no checksum!
 
 */
 
-    public String setOutInterface()
-    {
+    public String setOutInterface() {
         return "OUTX 0";
     }
-    public String autoGain()
-    {
+
+    public String autoGain() {
         return "AGAN";
     }
-    public String autoPhase()
-    {
+
+    public String autoPhase() {
         return "APHS";
     }
-    public String getOutputX()
-    {
-        return getOutputValue()+"1";
+
+    public String getOutputX() {
+        return getOutputValue() + "1";
     }
-    private String getOutputValue()
-    {
+
+    private String getOutputValue() {
         return "OUTP ? ";
     }
 }

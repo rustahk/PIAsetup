@@ -1,9 +1,7 @@
-public class ConsoleOutput
-{
+public class ConsoleOutput {
     private static DataStorage storage;
 
-    public  static void setLogging(DataStorage storage)
-    {
+    public static void setLogging(DataStorage storage) {
         ConsoleOutput.storage = storage;
     }
 
@@ -14,6 +12,7 @@ public class ConsoleOutput
     public static synchronized void serviceMessage(String msg) {
         sendMessage("[SYSTEM]: " + msg, true);
     }
+
     public static synchronized void userCommand(String command) {
         storage.addtoLog("[USER]: " + command);
     }
@@ -21,14 +20,12 @@ public class ConsoleOutput
     public static synchronized void unloggedMessage(String msg) {
         sendMessage(msg, false);
     }
-    private static synchronized void sendMessage(String msg, boolean logit)
-    {
+
+    private static synchronized void sendMessage(String msg, boolean logit) {
         System.out.println(msg);
         try {
             if (logit) storage.addtoLog(msg);
-        }
-        catch (NullPointerException e)
-        {
+        } catch (NullPointerException e) {
             System.out.println("[UNLOGGED ERROR]: " + e + " " + msg);
         }
     }

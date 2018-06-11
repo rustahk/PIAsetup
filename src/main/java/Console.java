@@ -1,5 +1,5 @@
 //Would be good to rewrite
-public class Console  {
+public class Console {
     private ConsoleCommands consoleCommands;
     private DataStorage dataStorage;
     private String bufferline;
@@ -39,8 +39,7 @@ public class Console  {
         }
     }
 
-    private void welcomemessage()
-    {
+    private void welcomemessage() {
         ConsoleOutput.serviceMessage("PIA setup is online");
     }
 
@@ -98,8 +97,7 @@ public class Console  {
         }
     }
 
-    private void scan()
-    {
+    private void scan() {
         ConsoleOutput.unloggedMessage("Scan mode is active");
         try {
             dataStorage.saveScan(consoleCommands.standartScan());
@@ -116,7 +114,6 @@ public class Console  {
             ConsoleOutput.errorMessage("CALIBRATION FAIL" + e.toString());
         }
     }
-
 
 
 }

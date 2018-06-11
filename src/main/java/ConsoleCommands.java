@@ -15,13 +15,15 @@ public class ConsoleCommands {
     private EngineCommands engineCommands;
     private LockInCommands lockInCommands;
     private Calibration calibration;
+    private DataStorage dataStorage;
 
-    public ConsoleCommands(Connection engine, Connection lockin, EngineCommands engineCommands, LockInCommands lockInCommands, Calibration calibration) {
+    public ConsoleCommands(Connection engine, Connection lockin, EngineCommands engineCommands, LockInCommands lockInCommands, Calibration calibration, DataStorage dataStorage) {
         this.engine = engine;
         this.engineCommands = engineCommands;
         this.calibration = calibration;
         this.lockin = lockin;
         this.lockInCommands = lockInCommands;
+        this.dataStorage = dataStorage;
     }
 
     public void rotateRight() throws IOException {
@@ -132,10 +134,13 @@ public class ConsoleCommands {
             if (start.getWavelenght() > finish.getWavelenght()) direction = -1;
             scanstep = Math.abs(finish.getWavelenght() - start.getWavelenght()) / numpoints;
             Dataset scan = new Dataset(points, new Date(), delay, scanstep);
+            dataStorage.startHotSave(dataStorage.getDataTimeStamp(scan.getStarttime()));
+            //dataStorage.startHotSave("");
             for (int i = 0; i <= numpoints; i++) {
                 points[i] = scanPoint(start.getWavelenght() + (scanstep * i * direction), delay);
             }
             scan.setFinishtime(new Date());
+            dataStorage.stopHotSave(dataStorage.getDataTimeStamp(scan.getFinishtime()));
             ConsoleOutput.serviceMessage("Scan finished");
             return scan;
 
@@ -153,6 +158,7 @@ public class ConsoleCommands {
         Thread.sleep(delay);
         point.setValue(sendLockinCommand(lockInCommands.getOutputX()));
         ConsoleOutput.unloggedMessage(point.getWavelenght() + "nm, " + point.getValue());
+        if(!dataStorage.addtoHotSave(point)) ConsoleOutput.errorMessage("HOT SAVE FAIL");
         return point;
     }
 

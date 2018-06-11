@@ -1,3 +1,7 @@
+
+/*
+this class realize Console interface
+ */
 //Would be good to rewrite
 public class Console {
     private ConsoleCommands consoleCommands;

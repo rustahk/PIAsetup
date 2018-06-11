@@ -1,5 +1,8 @@
-import java.util.Arrays;
 import java.util.Date;
+
+/*
+This class realize a single scan - array of points and support data
+ */
 
 public class Dataset {
     private Point[] points;

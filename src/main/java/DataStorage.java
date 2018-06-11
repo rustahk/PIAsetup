@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+//This class realize datastorage: saving scans and logging
+
 public class DataStorage {
 
     private File maindir;
@@ -11,6 +13,9 @@ public class DataStorage {
     private FileWriter logwriter;
     private SimpleDateFormat time;
     private SimpleDateFormat date;
+    private boolean hotstatus;
+    private File lastscan;
+    private FileWriter hotwriter;
 
     public DataStorage(String directory) {
         time = new SimpleDateFormat("HH:mm:ss");
@@ -47,9 +52,10 @@ public class DataStorage {
             FileWriter scanwriter = new FileWriter(scanfile, false);
             scanwriter.write(scanHead(dataset));
             for (Point i : dataset.getPoints()) {
-                scanwriter.write(i.getWavelenght() + " nm; " + i.getValue() + "\r\n");
+                addPointToFile(scanwriter, i);
             }
             scanwriter.flush();
+            scanwriter.close();
             ConsoleOutput.serviceMessage("Scan has been saved");
         } catch (IOException e) {
             ConsoleOutput.errorMessage(e.toString());
@@ -61,7 +67,7 @@ public class DataStorage {
         logwriter.flush();
     }
 
-    private String getDataTimeStamp(Date stamp) {
+    public String getDataTimeStamp(Date stamp) {
         return date.format(stamp) + " " + time.format(stamp);
     }
 
@@ -81,5 +87,66 @@ public class DataStorage {
         String line4 = "STEP: " + dataset.getStep() + "\r\n";
         String line5 = "TOTAL NUMBER OF POINTS: " + dataset.getPoints().length + "\r\n";
         return line1 + line2 + line3 + line4 + line5;
+    }
+
+    public boolean startHotSave(String comment)
+    {
+        if(hotstatus) return false;
+        hotstatus=true;
+        lastscan = new File(maindir.getAbsolutePath(), "lastscan.txt");
+        try
+        {
+            if (lastscan.exists()) lastscan.delete();
+            lastscan.createNewFile();
+            hotwriter = new FileWriter(lastscan, false);
+            addLineToFile(hotwriter, comment);
+        }
+        catch (IOException e)
+        {
+            ConsoleOutput.errorMessage(e.toString());
+            return false;
+        }
+        return true;
+    }
+
+    public boolean addtoHotSave(Point point)
+    {
+        if(!hotstatus) return false;
+        try
+        {
+            addPointToFile(hotwriter, point);
+            hotwriter.flush();
+        }
+        catch (IOException e)
+        {
+            ConsoleOutput.errorMessage(e.toString());
+            return false;
+        }
+        return true;
+    }
+    public boolean stopHotSave(String comment)
+    {
+        if(!hotstatus) return false;
+        try {
+            addLineToFile(hotwriter, comment);
+            hotwriter.flush();
+            hotwriter.close();
+        }
+        catch (IOException e)
+        {
+            ConsoleOutput.errorMessage(e.toString());
+            return false;
+        }
+        hotstatus=false;
+        return true;
+    }
+
+    private static void addPointToFile(FileWriter writer, Point point) throws IOException
+    {
+        addLineToFile(writer, point.getWavelenght() + " nm; " + point.getValue());
+    }
+    private static void addLineToFile(FileWriter writer, String line) throws IOException
+    {
+        writer.write(line + "\r\n");
     }
 }

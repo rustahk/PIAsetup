@@ -1,4 +1,9 @@
 public class ConsoleOutput {
+
+    /*
+    This class realize text output - sending info to console and log
+    */
+
     private static DataStorage storage;
 
     public static void setLogging(DataStorage storage) {

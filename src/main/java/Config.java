@@ -1,6 +1,10 @@
 import java.io.*;
 import java.util.Properties;
 
+/*
+Thiss class realize loading of the configuration file
+ */
+
 public class Config {
     private String engine_port;
     private Integer engine_baud;
@@ -77,13 +81,13 @@ public class Config {
 
     private void loadDefaultValues() {
         ConsoleOutput.serviceMessage("Using default config");
-        props.setProperty("engine_port", "COM3");
+        props.setProperty("engine_port", "COM4");
         props.setProperty("engine_baud", "9600");
         props.setProperty("engine_databits", "8");
         props.setProperty("engine_stopbit", "1");
         props.setProperty("engine_parity", "0");
         props.setProperty("engine_delay", "100");
-        props.setProperty("lockin_port", "COM6");
+        props.setProperty("lockin_port", "COM5");
         props.setProperty("lockin_baud", "9600");
         props.setProperty("lockin_databits", "8");
         props.setProperty("lockin_stopbit", "1");

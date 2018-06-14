@@ -1,4 +1,6 @@
-class Point
+package backend.data;
+
+public class Point
 //This class is realize a datapoint of scaning
 {
     private int position;//position in steps

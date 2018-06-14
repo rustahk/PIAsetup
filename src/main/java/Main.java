@@ -1,35 +1,38 @@
+import backend.core.ErrorProcessor;
+import backend.core.Initializer;
+import console.*;
 import jssc.SerialPortException;
 
 public class Main {
 
+    private static Initializer setup_init;
+
     public static void main(String[] args) {
-        String maindir = "C:\\PIAsetup";
-        DataStorage storage = new DataStorage(maindir);
-        ConsoleOutput.setLogging(storage);
-        Config config = new Config(maindir);
-        config.loadConfig();
-        Connection engine = new Connection(config.getEngine_port(), config.getEngine_baud(), config.getEngine_databits(), config.getEngine_stopbit(), config.getEngine_parity(), 9, false, config.getEngine_delay());
-        Connection lockin = new Connection(config.getLockin_port(), config.getLockin_baud(), config.getLockin_databits(), config.getLockin_stopbit(), config.getLockin_parity(), 0, true, config.getLockin_delay());
-        EngineCommands engineCommands = new EngineCommands();
-        LockInCommands lockInCommands = new LockInCommands();
-        Calibration calibration = new Calibration();
-        ConsoleCommands consoleCommands = new ConsoleCommands(engine, lockin, engineCommands, lockInCommands, calibration, storage);
+        //Start console output to see errors
+        ConsoleOutput output = new ConsoleOutput();
         try {
-            Console console = new Console(consoleCommands, storage);
-            engine.connect();
-            lockin.connect();
-            lockin.sendMessage(lockInCommands.setOutInterface());
-            console.startMode();
-        } catch (Exception e) {
-            ConsoleOutput.errorMessage(e.toString());
+            setup_init = new Initializer();
+            //Start console menu
+            ConsoleProcessor.mainmenu(output);
+        } catch (SerialPortException ex_port) {
+            ErrorProcessor.standartError("Start failed: Connection problem ", ex_port);
+        } catch (Exception ex_1) {
+            ErrorProcessor.standartError("Start failed: ", ex_1);
+
         } finally {
             try {
-                engine.disconnect();
-                lockin.disconnect();
-            } catch (SerialPortException e) {
-                ConsoleOutput.errorMessage(e.toString());
+                setup_init.close();
+            }
+            catch (Exception ex_2) {
+                ErrorProcessor.standartError("Fail to close connection: ", ex_2);
             }
         }
-        ConsoleOutput.serviceMessage("Programm closed");
+
+
+    }
+
+    public static void stop() //Main exit point
+    {
+        setup_init.close();
     }
 }

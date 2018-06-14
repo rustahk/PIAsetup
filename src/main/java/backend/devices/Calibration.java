@@ -1,3 +1,5 @@
+package backend.devices;
+
 public class Calibration {
 
 /*
@@ -6,25 +8,25 @@ All these parameters - result of MANUAL device calibration(!!!)
 */
 
     //Workrange is standart limit for motor position
-    private int minwstep = 0; //min workrange step //=1000nm
-    private int maxwstep = 12799250; //max workrange step //=0nm
-    private double maxwwave = 1000; //max workrange nm
-    private double minwwave = 0;  //min workrange nm
+    private static final int minwstep = 0; //min workrange step //=1000nm
+    private static final int maxwstep = 12799250; //max workrange step //=0nm
+    private static final double maxwwave = 1000; //max workrange nm
+    private static final double minwwave = 0;  //min workrange nm
     //Saferange is MAXIMUM/MINIMUM availble motor position. It's critical limits!!!
-    private int minsstep = -1035257; //min saferange step
-    private int maxsstep = 13598380; //max saferange step
-    private double maxswave = 1081.6; //max saferange nm
-    private double minswave = -6.1;  //min saferange nm
+    private static final int minsstep = -1035257; //min saferange step
+    private static final int maxsstep = 13598380; //max saferange step
+    private static final double maxswave = 1081.6; //max saferange nm
+    private static final double minswave = -6.1;  //min saferange nm
 
-    public int getMinwstep() {
+    public static int getMinwstep() {
         return minwstep;
     }
 
-    public int getMaxwstep() {
+    public static int getMaxwstep() {
         return maxwstep;
     }
 
-    public boolean positionLimit(int step, boolean increaserange) //check that input position (in steps) in limit (increaserange - work/safety limit)
+    public static boolean positionLimit(int step, boolean increaserange) //check that input position (in steps) in limit (increaserange - work/safety limit)
     {
         int maxstep;
         int minstep;
@@ -39,7 +41,7 @@ All these parameters - result of MANUAL device calibration(!!!)
         return true;
     }
 
-    public boolean positionLimit(double wavelenght, boolean increaserange) //check that input position (in nm) in limit (increaserange - work/safety limit)
+    public static boolean positionLimit(double wavelenght, boolean increaserange) //check that input position (in nm) in limit (increaserange - work/safety limit)
     {
         int maxstep;
         int minstep;
@@ -55,7 +57,7 @@ All these parameters - result of MANUAL device calibration(!!!)
         return true;
     }
 
-    public double wavelenghtCalc(int position) //recalc steps position to nm
+    public static double wavelenghtCalc(int position) //recalc steps position to nm
     {
         double wavelenght;
         double a = position - minwstep;
@@ -65,7 +67,7 @@ All these parameters - result of MANUAL device calibration(!!!)
         return wavelenght;
     }
 
-    public int positionCalc(double wavelenght) //recalc nm position to steps
+    public static int positionCalc(double wavelenght) //recalc nm position to steps
     {
         double position;
         double a = wavelenght - maxwwave;
@@ -75,7 +77,7 @@ All these parameters - result of MANUAL device calibration(!!!)
         return (int) position;
     }
 
-    public boolean speedLimit(int speed) //check that speed value in limits
+    public static boolean speedLimit(int speed) //check that speed value in limits
     {
         if (speed > 2047 || speed < 0) return false;
         return true;

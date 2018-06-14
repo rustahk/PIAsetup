@@ -1,3 +1,5 @@
+package backend.data;
+
 import java.util.Date;
 
 /*

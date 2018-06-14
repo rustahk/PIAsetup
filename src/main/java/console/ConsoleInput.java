@@ -1,3 +1,8 @@
+package console;
+
+import backend.core.ErrorProcessor;
+import backend.files.Logger;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -12,10 +17,11 @@ public class ConsoleInput {
     {
         try {
             String command = reader.readLine();
-            ConsoleOutput.userCommand(command);
+            command = "[USER]: " + command;
+            Logger.addtoLog(command);
             return command;
         } catch (IOException e) {
-            ConsoleOutput.errorMessage("USER IO " + e);
+            ErrorProcessor.standartError("user console input", e);
             return null;
         }
     }

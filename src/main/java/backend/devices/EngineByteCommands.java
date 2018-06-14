@@ -1,3 +1,5 @@
+package backend.devices;
+
 import java.nio.ByteBuffer;
 
 /*
@@ -10,44 +12,44 @@ EXAMPLE: (rotate right, speed 500) ROR 500 = {0x01, 0x01, 0x00, 0x00,0x00,0x00, 
 */
 
 
-public class EngineCommands {
+public class EngineByteCommands {
 
-    int module_address = 0x01;
-    int motor_number = 0x00;
+    private final static int module_address = 0x01;
+    private final static int motor_number = 0x00;
 
-    public int[] rotateRight(int velocity) {
+    public static int[] rotateRight(int velocity) {
         int command_number = 0x01;
         return createCommand(command_number, 0, velocity);
     }
 
-    public int[] rotateLeft(int velocity) {
+    public static int[] rotateLeft(int velocity) {
         int command_number = 0x02;
         return createCommand(command_number, 0, velocity);
     }
 
-    public int[] motorStop() {
+    public static int[] motorStop() {
         int command_number = 0x03;
         return createCommand(command_number, 0, 0);
     }
 
-    public int[] moveTo(int position) {
+    public static int[] moveTo(int position) {
         int command_number = 0x04;
         return createCommand(command_number, 0, position);
     } //move to absolute position
 
-    public int[] getPosition() //get axis parameter position
+    public static int[] getPosition() //get axis parameter position
     {
         int command_number = 0x06; //Number from the motor manual
         return createCommand(command_number, 1, 0);
     }
 
-    public int[] setPosition(int position) //set axis parameter position
+    public static int[] setPosition(int position) //set axis parameter position
     {
         int command_number = 0x05; //Number from the motor manual
         return createCommand(command_number, 1, position);
     }
 
-    private byte calcChecksum(int[] message) {
+    private static byte calcChecksum(int[] message) {
         int checksumReal = 0;
         message[8] = 0; //set calcChecksum byte to zero
         for (int i : message) {
@@ -56,7 +58,7 @@ public class EngineCommands {
         return ByteBuffer.allocate(4).putInt(checksumReal).array()[3];
     } //calc last (9) byte for each command
 
-    private int[] addValue(int[] command, int value) {
+    private static int[] addValue(int[] command, int value) {
         byte[] valueBytes = ByteBuffer.allocate(4).putInt(value).array();
         for (int i = 0; i < 4; i++) {
             command[i + 4] = valueBytes[i];
@@ -64,7 +66,7 @@ public class EngineCommands {
         return command;
     } //add int (4 bytes) value to byte array
 
-    public int getValue(int[] reply) //eject int (4 bytes) value from byte array
+    public static int getValue(int[] reply) //eject int (4 bytes) value from byte array
     {
         String value = "";
         boolean minus = false;
@@ -83,14 +85,14 @@ public class EngineCommands {
         return (c + 1) * -1;
     }
 
-    private int[] commandTemplate() {
+    private static int[] commandTemplate() {
         int[] command = new int[9];
         command[0] = module_address;
         command[3] = motor_number;
         return command;
     } //standart command template
 
-    private int[] createCommand(int command_number, int type_number, int value) {
+    private static int[] createCommand(int command_number, int type_number, int value) {
         int[] command = commandTemplate();
         command[1] = command_number;
         command[2] = type_number;
@@ -99,7 +101,7 @@ public class EngineCommands {
         return command;
     } //construct command
 
-    public boolean commandStatus(int[] command, int[] reply) //check reply  & return ture if it is correct
+    public static boolean commandStatus(int[] command, int[] reply) //check reply  & return ture if it is correct
     {
         //checklist
         if (reply[8] != calcChecksum(reply)) return false; //calcChecksum byte
@@ -108,7 +110,7 @@ public class EngineCommands {
         return true;
     }
 
-    public int[] getSpeed() //get current speed of a motor
+    public static int[] getSpeed() //get current speed of a motor
     {
         int command_number = 0x06; //Number from the motor manual
         return createCommand(command_number, 3, 0);

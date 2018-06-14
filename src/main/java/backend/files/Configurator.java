@@ -1,3 +1,8 @@
+package backend.files;
+
+import backend.core.ErrorProcessor;
+import backend.core.ServiceProcessor;
+
 import java.io.*;
 import java.util.Properties;
 
@@ -5,7 +10,7 @@ import java.util.Properties;
 Thiss class realize loading of the configuration file
  */
 
-public class Config {
+public class Configurator {
     private String engine_port;
     private Integer engine_baud;
     private Integer engine_databits;
@@ -20,27 +25,22 @@ public class Config {
     private Integer lockin_delay;
 
     private Properties props;
-    private String maindir;
     private FileInputStream configin;
     private FileOutputStream configout;
     private File configfile;
 
-    public Config(String maindir) {
-        this.maindir = maindir;
-    }
-
     public void loadConfig() {
-        configfile = new File(maindir + "\\config.ini");
+        configfile = new File(FileManager.mainfile.getAbsolutePath() + "\\config.ini");
         props = new Properties();
         try {
             configin = new FileInputStream(configfile);
             props.load(configin);
         } catch (FileNotFoundException e) {
-            ConsoleOutput.errorMessage("Config file not found " + e);
+            ErrorProcessor.standartError("Config file not found", e);
             loadDefaultValues();
             saveConfigFile();
         } catch (IOException e) {
-            ConsoleOutput.errorMessage("Config file reading error " + e);
+            ErrorProcessor.standartError("Config file reading error ", e);
             loadDefaultValues();
             saveConfigFile();
         }
@@ -68,19 +68,19 @@ public class Config {
             lockin_stopbit = Integer.valueOf(props.getProperty("lockin_stopbit"));
             lockin_parity = Integer.valueOf(props.getProperty("lockin_parity"));
             lockin_delay = Integer.valueOf(props.getProperty("lockin_delay"));
-            ConsoleOutput.serviceMessage("Config file has been loaded");
         } catch (NullPointerException e) {
-            ConsoleOutput.errorMessage("Config file is not correct " + e);
+            ErrorProcessor.standartError("Config file is not correct", e);
             return false;
         } catch (NumberFormatException e) {
-            ConsoleOutput.errorMessage("Config file is not correct " + e);
+            ErrorProcessor.standartError("Config file is not correct", e);
             return false;
         }
+        ServiceProcessor.serviceMessage("Config file has been loaded");
         return true;
     }
 
     private void loadDefaultValues() {
-        ConsoleOutput.serviceMessage("Using default config");
+        ServiceProcessor.serviceMessage("Using default config");
         props.setProperty("engine_port", "COM4");
         props.setProperty("engine_baud", "9600");
         props.setProperty("engine_databits", "8");
@@ -102,7 +102,7 @@ public class Config {
             configfile.createNewFile();
             saveConfigFile();
         } catch (IOException e) {
-            ConsoleOutput.errorMessage("fail to delete old config" + e);
+            ErrorProcessor.standartError("fail to delete old config", e);
         }
     }
 
@@ -111,11 +111,9 @@ public class Config {
             configout = new FileOutputStream(configfile);
             props.store(configout, "DEFAULT CONFIG");
             configout.close();
-            ConsoleOutput.serviceMessage("New config file is saved");
-        } catch (FileNotFoundException e) {
-            ConsoleOutput.errorMessage("fail to create default config file " + e);
-        } catch (IOException e) {
-            ConsoleOutput.errorMessage("fail to create default config file " + e);
+            ServiceProcessor.serviceMessage("New config file is saved");
+        }  catch (Exception e) {
+            ErrorProcessor.standartError("fail to create default config file ", e);
         }
     }
 

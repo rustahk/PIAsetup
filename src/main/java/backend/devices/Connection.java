@@ -1,11 +1,12 @@
+package backend.devices;
+
+import backend.core.ServiceProcessor;
 import jssc.SerialPort;
 import jssc.SerialPortEvent;
 import jssc.SerialPortEventListener;
 import jssc.SerialPortException;
-
 import java.io.*;
 import java.util.LinkedList;
-import java.util.concurrent.TimeUnit;
 /*
 This class is realize connection to a device byt COM port, data in & output
  */
@@ -27,9 +28,6 @@ public class Connection {
 
     private int responcedelay; //COM port and devices are not infinity fast. This parameter give
 
-    public int getResponcedelay() {
-        return responcedelay;
-    }
 
     public Connection(String portname, int baudrate, int databits, int stopbits, int parity, int messagesize, boolean responceString, int responcedelay) {
         status = false;
@@ -56,7 +54,7 @@ public class Connection {
 
         port.addEventListener(portreader, SerialPort.MASK_RXCHAR);
         status = true;
-        ConsoleOutput.serviceMessage("Connected to " + portname);
+        ServiceProcessor.serviceMessage("Connected to " + portname);
 
     }
 
@@ -68,8 +66,15 @@ public class Connection {
         port.writeString(message + '\r');
     }
 
-    public int[] getByteResponce(int delay) throws IOException, InterruptedException {
-        Thread.sleep(delay);//DEALY TO GET REPLY, NOT HARD VALUE
+    public int[] getByteResponce() throws IOException
+    {
+        try {
+            Thread.sleep(responcedelay);//DEALY TO GET REPLY, NOT HARD VALUE
+        }
+        catch (InterruptedException e)
+        {
+
+        }
         int[] reply = new int[messagesize];
         {
             for (int i = 0; i < messagesize; i++) {
@@ -79,9 +84,8 @@ public class Connection {
         return reply;
     }
 
-    public String getStringResponce(int delay) throws IOException, InterruptedException {
-        Thread.sleep(delay);//DEALY TO GET REPLY, NOT HARD VALUE
-        TimeUnit.MILLISECONDS.sleep(delay);
+    public String getStringResponce() throws IOException, InterruptedException {
+        Thread.sleep(responcedelay);
         return portreader.readString();
     }
 
@@ -89,7 +93,7 @@ public class Connection {
         if (status) {
             port.closePort();
             status = false;
-            ConsoleOutput.serviceMessage(portname + " disconnected");
+            ServiceProcessor.serviceMessage(portname + " disconnected");
         }
     }
 

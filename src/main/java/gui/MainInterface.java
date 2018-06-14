@@ -9,9 +9,4 @@ public class MainInterface extends Thread
     public MainInterface(HotPoint hotPoint) {
         this.hotPoint = hotPoint;
     }
-
-    public void run() {
-        HotPlot.setHotPoint(hotPoint);
-        HotPlot.startHotPlot();
-    }
 }

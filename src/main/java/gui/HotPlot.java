@@ -10,7 +10,7 @@ import javafx.scene.chart.ScatterChart;
 import javafx.scene.chart.XYChart;
 import javafx.stage.Stage;
 
-public class HotPlot extends Application
+public class HotPlot extends Application implements Runnable
 {
     private static HotPoint hotpoint;
 
@@ -22,8 +22,10 @@ public class HotPlot extends Application
     public void start(Stage stage) throws Exception
     {
         stage.setTitle("Scan Plot");
-        NumberAxis xAxis = new NumberAxis(790, 830, 1);
+        NumberAxis xAxis = new NumberAxis();
+        xAxis.setForceZeroInRange(false);
         NumberAxis yAxis = new NumberAxis();
+        yAxis.setForceZeroInRange(false);
         ScatterChart<Number, Number> sc = new ScatterChart<Number, Number>(xAxis, yAxis);
         xAxis.setLabel("Wavelenght, nm");
         yAxis.setLabel("Signal, V");
@@ -40,8 +42,7 @@ public class HotPlot extends Application
         });
     }
 
-    public static void startHotPlot()
-    {
+    public void run() {
         if(hotpoint == null) new NullPointerException("hotpoint cannot be null");
         launch();
     }

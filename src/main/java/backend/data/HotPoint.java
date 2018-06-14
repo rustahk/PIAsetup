@@ -62,4 +62,13 @@ public class HotPoint
     public void setY(double y) {
         this.y.set(y);
     }
+
+    public static void updatePoint(final HotPoint hotpoint, final double x, final double y)
+    {
+        Platform.runLater(new Runnable() {
+            public void run() {
+                hotpoint.setXY(x, y);
+            }
+        });
+    }
 }

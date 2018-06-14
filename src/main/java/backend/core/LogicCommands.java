@@ -2,12 +2,12 @@ package backend.core;
 
 import backend.data.Dataset;
 import backend.data.HotPoint;
-import backend.data.HotUpdater;
 import backend.data.Point;
 import backend.devices.*;
 import backend.files.FileManager;
 import backend.files.HotSave;
 import backend.files.StandartSave;
+import gui.HotPlot;
 import gui.MainInterface;
 
 import java.util.ArrayList;
@@ -32,7 +32,8 @@ public class LogicCommands
         HotSave hotSave = new HotSave();
         hotSave.startHotSave(FileManager.getDateTimeStamp(dataset.getStarttime()));
         hotPoint = new HotPoint();
-        new MainInterface(hotPoint).start();
+        HotPlot.setHotPoint(hotPoint);
+        new Thread(new HotPlot()).start();
         for (int i = 0; i <= numpoints; i++)
         {
             points[i] = scanPoint(start.getWavelenght() + (scanstep * i * direction), delay);
@@ -85,7 +86,7 @@ public class LogicCommands
             return null;
         }
         point.setValue(Lockin.sendCommand(LockinStringCommands.getOutputX()));
-        HotUpdater.updatePoint(hotPoint, point.getWavelenght(), Double.parseDouble(point.getValue()));
+        HotPoint.updatePoint(hotPoint, point.getWavelenght(), Double.parseDouble(point.getValue()));
         return point;
 
 

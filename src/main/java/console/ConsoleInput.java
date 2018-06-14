@@ -17,8 +17,7 @@ public class ConsoleInput {
     {
         try {
             String command = reader.readLine();
-            command = "[USER]: " + command;
-            Logger.addtoLog(command);
+            Logger.addtoLog("[USER]: " +command);
             return command;
         } catch (IOException e) {
             ErrorProcessor.standartError("user console input", e);

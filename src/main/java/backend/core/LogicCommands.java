@@ -1,11 +1,15 @@
 package backend.core;
 
 import backend.data.Dataset;
+import backend.data.HotPoint;
+import backend.data.HotUpdater;
 import backend.data.Point;
 import backend.devices.*;
 import backend.files.FileManager;
 import backend.files.HotSave;
 import backend.files.StandartSave;
+import gui.MainInterface;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -14,6 +18,8 @@ import java.util.List;
 //All methods here using "clean" and cheked values.
 public class LogicCommands
 {
+    private static HotPoint hotPoint;
+
     private static List<PointRecipient> listeners = new ArrayList<PointRecipient>();
 
     public static Dataset startScan(Point start, Point finish, int numpoints, int delay)
@@ -25,6 +31,8 @@ public class LogicCommands
         Dataset dataset = new Dataset(points, new Date(), delay, scanstep);
         HotSave hotSave = new HotSave();
         hotSave.startHotSave(FileManager.getDateTimeStamp(dataset.getStarttime()));
+        hotPoint = new HotPoint();
+        new MainInterface(hotPoint).start();
         for (int i = 0; i <= numpoints; i++)
         {
             points[i] = scanPoint(start.getWavelenght() + (scanstep * i * direction), delay);
@@ -77,6 +85,7 @@ public class LogicCommands
             return null;
         }
         point.setValue(Lockin.sendCommand(LockinStringCommands.getOutputX()));
+        HotUpdater.updatePoint(hotPoint, point.getWavelenght(), Double.parseDouble(point.getValue()));
         return point;
 
 

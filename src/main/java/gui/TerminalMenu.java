@@ -24,7 +24,7 @@ public class TerminalMenu implements SystemRecipient, ErrorRecipient{
     {
         ErrorProcessor.addErrorRecipient(this);
         ServiceProcessor.addSystemRecipient(this);
-        Scene secondScene = new Scene(new Group());
+        Scene secondScene = new Scene(new Group(), 512, 152);
         terminalWindow = new Stage();
         terminalWindow.initModality(Modality.NONE);
         terminalWindow.initOwner(mainMenu);

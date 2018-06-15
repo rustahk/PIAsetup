@@ -1,5 +1,12 @@
 package gui;
 
+import backend.core.LogicCommands;
+import backend.data.HotPoint;
+import backend.data.Point;
+import backend.devices.Calibration;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -25,6 +32,7 @@ class ScanMenu implements EventHandler<ActionEvent>
 
     public void handle(ActionEvent event)
     {
+        HotPoint.test = new HotPoint(); //MAIN GUI TEST
         //**Axis**
         NumberAxis xAxis = new NumberAxis();
         xAxis.setForceZeroInRange(false);
@@ -54,8 +62,28 @@ class ScanMenu implements EventHandler<ActionEvent>
         scanWindow.initOwner(primaryStage);
         scanWindow.setTitle("Scan");
         scanWindow.setScene(secondScene);
-        //Button actions
+        //Actions
+        start.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                Task scannig = new Task() {
+                    @Override
+                    protected Object call() throws Exception {
+                        Point start = new Point(Calibration.positionCalc(400), 400);
+                        Point finish = new Point(Calibration.positionCalc(500), 500);
+                        LogicCommands.startScan(start, finish, 100, 50);
+                        return null;
+                    }
+                };
+                new Thread(scannig).start();
 
+            }
+        });
+        HotPoint.test.nProperty().addListener(new ChangeListener<Number>() {
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                current_series.getData().add(new ScatterChart.Data<Number, Number>(HotPoint.test.getX(), HotPoint.test.getY()));
+            }
+        });
 
         //Show
         scanWindow.show();

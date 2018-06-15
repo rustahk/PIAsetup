@@ -30,9 +30,9 @@ public class LogicCommands
         Dataset dataset = new Dataset(points, new Date(), delay, scanstep);
         HotSave hotSave = new HotSave();
         hotSave.startHotSave(FileManager.getDateTimeStamp(dataset.getStarttime()));
-        hotPoint = new HotPoint();
-        HotConsolePlot.setHotPoint(hotPoint);
-        new Thread(new HotConsolePlot()).start();
+        //hotPoint = new HotPoint();//CONSOLE PLOT
+        //HotConsolePlot.setHotPoint(hotPoint); //CONSOLE PLOT
+        //new Thread(new HotConsolePlot()).start(); //CONSOLE POLT
         for (int i = 0; i <= numpoints; i++)
         {
             points[i] = scanPoint(start.getWavelenght() + (scanstep * i * direction), delay);
@@ -85,7 +85,8 @@ public class LogicCommands
             return null;
         }
         point.setValue(Lockin.sendCommand(LockinStringCommands.getOutputX()));
-        HotPoint.updatePoint(hotPoint, point.getWavelenght(), Double.parseDouble(point.getValue()));
+        ServiceProcessor.serviceMessage(point.getWavelenght() + " nm; " +point.getValue()+" V");
+        HotPoint.updatePoint(HotPoint.test, point.getWavelenght(), Double.parseDouble(point.getValue()));
         return point;
 
 

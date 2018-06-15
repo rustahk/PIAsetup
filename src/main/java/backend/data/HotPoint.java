@@ -8,6 +8,8 @@ import javafx.beans.property.SimpleIntegerProperty;
 
 public class HotPoint
 {
+    public static HotPoint test;
+
     private DoubleProperty x;
     private DoubleProperty y;
     private IntegerProperty n; //flag for listeners (and number of scaned points)

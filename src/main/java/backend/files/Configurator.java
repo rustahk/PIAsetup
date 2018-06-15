@@ -75,7 +75,6 @@ public class Configurator {
             ErrorProcessor.standartError("Config file is not correct", e);
             return false;
         }
-        ServiceProcessor.serviceMessage("Config file: OK");
         return true;
     }
 

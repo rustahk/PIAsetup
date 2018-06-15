@@ -16,7 +16,7 @@ public class ServiceProcessor {
     public static void serviceMessage(String msg)
     {
         msg="[SYSTEM]: " + msg;
-        Logger.addtoLog(msg);
+        //Logger.addtoLog(msg);
         for(SystemRecipient r : listeners) r.serviceMessage(msg);
     }
 

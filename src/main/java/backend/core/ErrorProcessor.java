@@ -17,7 +17,7 @@ public class ErrorProcessor {
     public static void standartError(String comment, Exception e)
     {
         comment="[ERROR]: "+comment;
-        Logger.addtoLog(comment + " " + e.toString());
+        //Logger.addtoLog(comment + " " + e.toString());
         for(ErrorRecipient r : listeners) r.standartError(comment, e);
     }
 }

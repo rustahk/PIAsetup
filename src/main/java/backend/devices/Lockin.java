@@ -17,4 +17,8 @@ public class Lockin {
             return null;
         }
     }
+
+    public static Connection getConnection() {
+        return connection;
+    }
 }

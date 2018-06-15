@@ -2,27 +2,21 @@ package gui;
 
 import backend.core.Initializer;
 import backend.core.ServiceProcessor;
-import javafx.application.Application;
 
-public class InterfaceManager
-{
-    public static Thread startTerminal()
-    {
-        Thread terminal = new Thread(new TerminalWindow());
-        try
-        {
+public class InterfaceManager {
+    public static Thread startGUI() {
+        Thread mainmenu = new Thread(new MainMenu());
+        try {
             Thread.sleep(250); //Strange bug - time to time application cannot start without this timer
-            terminal.start();
+            mainmenu.start();
             Initializer.startLogger();
-            while (!TerminalWindow.isWindowStatus()) {
+            while (!TerminalMenu.isWindowStatus()) {
                 Thread.sleep(250);
             }
-            ServiceProcessor.serviceMessage("Terminal: OK");
+            ServiceProcessor.serviceMessage("TerminalMenu: OK");
             return null;
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             throw new NullPointerException("Application GUI start fail" + e);
         }
     }
-
 }

@@ -7,7 +7,7 @@ import backend.devices.*;
 import backend.files.FileManager;
 import backend.files.HotSave;
 import backend.files.StandartSave;
-import gui.HotPlot;
+import gui.HotConsolePlot;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -31,8 +31,8 @@ public class LogicCommands
         HotSave hotSave = new HotSave();
         hotSave.startHotSave(FileManager.getDateTimeStamp(dataset.getStarttime()));
         hotPoint = new HotPoint();
-        HotPlot.setHotPoint(hotPoint);
-        new Thread(new HotPlot()).start();
+        HotConsolePlot.setHotPoint(hotPoint);
+        new Thread(new HotConsolePlot()).start();
         for (int i = 0; i <= numpoints; i++)
         {
             points[i] = scanPoint(start.getWavelenght() + (scanstep * i * direction), delay);

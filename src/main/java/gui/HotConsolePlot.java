@@ -10,7 +10,7 @@ import javafx.scene.chart.ScatterChart;
 import javafx.scene.chart.XYChart;
 import javafx.stage.Stage;
 
-public class HotPlot extends Application implements Runnable
+public class HotConsolePlot extends Application implements Runnable
 {
     private static HotPoint hotpoint;
 

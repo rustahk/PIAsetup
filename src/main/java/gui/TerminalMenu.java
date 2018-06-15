@@ -5,28 +5,41 @@ import backend.core.ErrorRecipient;
 import backend.core.ServiceProcessor;
 import backend.core.SystemRecipient;
 import javafx.application.Application;
+import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.TextArea;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-public class TerminalWindow extends Application implements SystemRecipient, ErrorRecipient, Runnable{
+public class TerminalMenu implements SystemRecipient, ErrorRecipient{
 
     private static boolean windowStatus;
     private static TextArea textArea;
+    private static Stage terminalWindow;
 
-    public void start(Stage primaryStage) throws Exception {
 
+    public TerminalMenu(Stage mainMenu) throws Exception
+    {
         ErrorProcessor.addErrorRecipient(this);
         ServiceProcessor.addSystemRecipient(this);
-        primaryStage.setTitle("Terminal");
+        Scene secondScene = new Scene(new Group());
+        terminalWindow = new Stage();
+        terminalWindow.initModality(Modality.NONE);
+        terminalWindow.initOwner(mainMenu);
+        terminalWindow.setTitle("Terminal");
         textArea = new TextArea();
         VBox vbox = new VBox(textArea);
-        Scene scene = new Scene(vbox);
-        primaryStage.setScene(scene);
-        primaryStage.show();
-        windowStatus = true;
+        ((Group)secondScene.getRoot()).getChildren().add(vbox);
+        terminalWindow.setScene(secondScene);
+    }
 
+    public void openWindow()
+    {
+        terminalWindow.setX(terminalWindow.getOwner().getX()); //Shift of window position when opens
+        terminalWindow.show();
+        windowStatus = true;
     }
 
     public static void addLine(String line) {
@@ -43,9 +56,5 @@ public class TerminalWindow extends Application implements SystemRecipient, Erro
 
     public void serviceMessage(String msg) {
         addLine(msg);
-    }
-
-    public void run() {
-        Application.launch(TerminalWindow.class, null);
     }
 }

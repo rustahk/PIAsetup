@@ -38,4 +38,8 @@ public class Engine
         }
         return true;
     }
+
+    public static Connection getConnection() {
+        return connection;
+    }
 }

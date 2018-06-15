@@ -19,7 +19,7 @@ public class Main {
 
     private static void startGUI()
     {
-        InterfaceManager.startTerminal();
+        InterfaceManager.startGUI();
         Initializer.loadConfig();
         try {
             Initializer.configConnection();

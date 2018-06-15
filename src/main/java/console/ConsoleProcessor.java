@@ -49,7 +49,7 @@ public class ConsoleProcessor {
         output.unloggedMessage(" 'calibr' to start calibration ");
         output.unloggedMessage(" 'scan' to start scan ");
         output.unloggedMessage(" 'control' to activate manual control");
-        output.unloggedMessage(" 'quit' to close the program ");
+        output.unloggedMessage(" 'quit' to fullClose the program ");
     }
 
     private static void helpcontrol() {

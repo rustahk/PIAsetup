@@ -8,7 +8,6 @@ import backend.files.FileManager;
 import backend.files.HotSave;
 import backend.files.StandartSave;
 import gui.HotPlot;
-import gui.MainInterface;
 
 import java.util.ArrayList;
 import java.util.Date;

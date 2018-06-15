@@ -54,7 +54,7 @@ public class Connection {
 
         port.addEventListener(portreader, SerialPort.MASK_RXCHAR);
         status = true;
-        ServiceProcessor.serviceMessage("Connected to " + portname);
+        ServiceProcessor.serviceMessage(portname + " connection: OK");
 
     }
 

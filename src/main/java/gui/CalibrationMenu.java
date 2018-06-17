@@ -30,7 +30,9 @@ public class CalibrationMenu {
                     ServiceProcessor.serviceMessage("Position updated: " + value + " nm");
                     calibrated = true;
                 }
-                noReply();
+                noReply(); //Add exit to connection menu?
+                if(calibrated) noUpdate();
+                else MainMenu.closeProgram();
             } else {
                 outOfRange(value);
             }

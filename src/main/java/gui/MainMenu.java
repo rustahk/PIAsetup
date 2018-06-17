@@ -24,7 +24,7 @@ public class MainMenu extends Application {
         terminalMenu = new TerminalMenu(primaryStage);
         terminalMenu.openWindow();
         //$activate before release
-        if(!Initializer.fullInit())
+        /*if(!Initializer.fullInit())
         {
             badInit();
             closeProgram();
@@ -33,11 +33,11 @@ public class MainMenu extends Application {
         else
         {
             loadMainMenu(primaryStage);
-        }
+        }*/
 
         //$ONLY FOR DEVELOPING!!!
-        //Initializer.fullInit();
-        //loadMainMenu(primaryStage);
+        Initializer.fullInit();
+        loadMainMenu(primaryStage);
     }
 
     private void badInit()
@@ -97,7 +97,7 @@ public class MainMenu extends Application {
         }
         try
         {
-            terminalMenu.closeWindow();
+            mainStage.close();
         }
         catch (NullPointerException e)
         {

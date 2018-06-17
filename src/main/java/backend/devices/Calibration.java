@@ -53,7 +53,7 @@ All these parameters - result of MANUAL device calibration(!!!)
             minstep = minwstep;
         }
         int step = positionCalc(wavelenght);
-        if (step >= maxstep || step <= minstep) return false;
+        if (step > maxstep || step < minstep) return false;
         return true;
     }
 

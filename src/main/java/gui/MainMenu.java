@@ -18,16 +18,22 @@ public class MainMenu extends Application {
         //Connection to setup elements
         terminalMenu = new TerminalMenu(primaryStage);
         terminalMenu.openWindow();
+        /*//activate before release
         if(!Initializer.fullInit())
         {
             badInit();
-            Initializer.fullClose();
+            terminalMenu.closeWindow();
+            primaryStage.close();
+            //Initializer.fullClose(); //FIX here
         }
         else
         {
             loadMainMenu(primaryStage);
         }
-
+        */
+        //ONLY FOR DEVELOPING!!!
+        Initializer.fullInit();
+        loadMainMenu(primaryStage);
     }
 
     private void badInit()

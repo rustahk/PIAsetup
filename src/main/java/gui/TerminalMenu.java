@@ -24,14 +24,14 @@ public class TerminalMenu implements SystemRecipient, ErrorRecipient{
     {
         ErrorProcessor.addErrorRecipient(this);
         ServiceProcessor.addSystemRecipient(this);
-        Scene secondScene = new Scene(new Group(), 512, 152);
         terminalWindow = new Stage();
         terminalWindow.initModality(Modality.NONE);
         terminalWindow.initOwner(mainMenu);
         terminalWindow.setTitle("Terminal");
         textArea = new TextArea();
-        VBox vbox = new VBox(textArea);
-        ((Group)secondScene.getRoot()).getChildren().add(vbox);
+        //VBox vbox = new VBox(textArea);
+        //((Group)secondScene.getRoot()).getChildren().add(vbox);
+        Scene secondScene = new Scene(textArea, 700, 256);
         terminalWindow.setScene(secondScene);
     }
 
@@ -40,6 +40,11 @@ public class TerminalMenu implements SystemRecipient, ErrorRecipient{
         terminalWindow.setX(terminalWindow.getOwner().getX()); //Shift of window position when opens
         terminalWindow.show();
         windowStatus = true;
+    }
+
+    public void closeWindow()
+    {
+        terminalWindow.close();
     }
 
     public static void addLine(String line) {

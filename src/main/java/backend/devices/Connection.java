@@ -5,6 +5,7 @@ import jssc.SerialPort;
 import jssc.SerialPortEvent;
 import jssc.SerialPortEventListener;
 import jssc.SerialPortException;
+
 import java.io.*;
 import java.util.LinkedList;
 /*
@@ -66,15 +67,8 @@ public class Connection {
         port.writeString(message + '\r');
     }
 
-    public int[] getByteResponce() throws IOException
-    {
-        try {
-            Thread.sleep(responcedelay);//DEALY TO GET REPLY, NOT HARD VALUE
-        }
-        catch (InterruptedException e)
-        {
-
-        }
+    public int[] getByteResponce() throws IOException, InterruptedException {
+        Thread.sleep(responcedelay);//DEALY TO GET REPLY, NOT HARD VALUE
         int[] reply = new int[messagesize];
         {
             for (int i = 0; i < messagesize; i++) {

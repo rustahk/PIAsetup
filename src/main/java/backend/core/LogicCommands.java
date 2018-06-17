@@ -1,14 +1,14 @@
 package backend.core;
 
 import backend.data.Dataset;
-import backend.data.HotPoint;
 import backend.data.Point;
 import backend.devices.*;
 import backend.files.FileManager;
 import backend.files.HotSave;
 import backend.files.StandartSave;
-import gui.HotConsolePlot;
+import jssc.SerialPortException;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -17,8 +17,6 @@ import java.util.List;
 //All methods here using "clean" and cheked values.
 public class LogicCommands
 {
-    private static HotPoint hotPoint;
-
     private static List<PointRecipient> listeners = new ArrayList<PointRecipient>();
 
     public static Dataset startScan(Point start, Point finish, int numpoints, int delay)
@@ -30,13 +28,24 @@ public class LogicCommands
         Dataset dataset = new Dataset(points, new Date(), delay, scanstep);
         HotSave hotSave = new HotSave();
         hotSave.startHotSave(FileManager.getDateTimeStamp(dataset.getStarttime()));
-        //hotPoint = new HotPoint();//CONSOLE PLOT
-        //HotConsolePlot.setHotPoint(hotPoint); //CONSOLE PLOT
-        //new Thread(new HotConsolePlot()).start(); //CONSOLE POLT
         for (int i = 0; i <= numpoints; i++)
         {
-            points[i] = scanPoint(start.getWavelenght() + (scanstep * i * direction), delay);
-            for(PointRecipient r : listeners) r.newPoint(points[i]);
+            try
+            {
+                points[i] = scanPoint(start.getWavelenght() + (scanstep * i * direction), delay);
+                for(PointRecipient r : listeners) r.newPoint(points[i]);
+                if(Thread.interrupted()) throw new InterruptedException();
+            }
+            catch (InterruptedException e)
+            {
+                ServiceProcessor.serviceMessage("Scan interrupted by user");
+                break;
+            }
+            catch (Exception e)
+            {
+                ErrorProcessor.standartError("Scan interrupted: ", e);
+                //$break;
+            }
         }
         dataset.setFinishtime(new Date());
         hotSave.stopHotSave(FileManager.getDateTimeStamp(dataset.getFinishtime()));
@@ -48,11 +57,19 @@ public class LogicCommands
             Engine.sendCommand(EngineByteCommands.setPosition(currentpoint.getPosition()));
             Engine.sendCommand(EngineByteCommands.motorStop()); //After first calibration motor try to move
         }
-        catch (Exception e)
+        catch (SerialPortException e)
         {
             return false;
         }
-        return false;
+        catch (IOException e)
+        {
+            return false;
+        }
+        catch (InterruptedException e)
+        {
+            return false;
+        }
+        return true;
     }
     public static void startControl()
     {
@@ -64,32 +81,15 @@ public class LogicCommands
        return StandartSave.saveDataset(dataset);
     }
 
-    private static Point scanPoint(double wavelenght, int delay)
+    private static Point scanPoint(double wavelenght, int delay) throws IOException, SerialPortException, InterruptedException
     {
-        Point point = new Point(Calibration.positionCalc(wavelenght), wavelenght);
-        try
-        {
-            Engine.sendCommand(EngineByteCommands.moveTo(Calibration.positionCalc(wavelenght)));
-        }
-        catch (Exception e)
-        {
-            return null;
-        }
-        Engine.waitMoving();
-        try
-        {
-            Thread.sleep(delay);
-        }
-        catch (InterruptedException e)
-        {
-            return null;
-        }
-        point.setValue(Lockin.sendCommand(LockinStringCommands.getOutputX()));
-        ServiceProcessor.serviceMessage(point.getWavelenght() + " nm; " +point.getValue()+" V");
-        HotPoint.updatePoint(HotPoint.test, point.getWavelenght(), Double.parseDouble(point.getValue()));
+        Point point = new Point(wavelenght);
+        //$Engine.sendCommand(EngineByteCommands.moveTo(point.getPosition()));
+        //$Engine.waitMoving();
+        Thread.sleep(delay);
+        //$point.setValue(Lockin.sendCommand(LockinStringCommands.getOutputX()));
+        point.setValue(Math.random()*5+""); //$RANDOM_VALUES FOR TESTING
         return point;
-
-
     }
 
     public static void addPointRecipient(PointRecipient toAdd)

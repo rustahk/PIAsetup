@@ -60,8 +60,8 @@ public class Initializer {
     public static boolean initEngine() throws SerialPortException {
         try {
             engine_connection = new Connection(config.getEngine_port(), config.getEngine_baud(), config.getEngine_databits(), config.getEngine_stopbit(), config.getEngine_parity(), 9, false, config.getEngine_delay());
-            engine_connection.connect();
             Engine.init(engine_connection);
+            engine_connection.connect();
         } catch (Exception e) {
             ErrorProcessor.standartError("Engine: FAIL", e);
             return false;
@@ -75,8 +75,8 @@ public class Initializer {
 
         try {
             lockin_connection = new Connection(config.getLockin_port(), config.getLockin_baud(), config.getLockin_databits(), config.getLockin_stopbit(), config.getLockin_parity(), 0, true, config.getLockin_delay());
-            lockin_connection.connect();
             Lockin.init(lockin_connection);
+            lockin_connection.connect();
             Lockin.sendCommand(LockinStringCommands.setOutInterface());
         } catch (Exception e) {
             ErrorProcessor.standartError("Lockin: FAIL", e);

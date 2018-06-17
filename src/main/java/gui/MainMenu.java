@@ -1,6 +1,8 @@
 package gui;
 
 import backend.core.Initializer;
+import backend.core.ServiceProcessor;
+import backend.files.FileManager;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -11,29 +13,31 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.util.Date;
+
 public class MainMenu extends Application {
     private static TerminalMenu terminalMenu;
+    private static Stage mainStage;
 
     public void start(Stage primaryStage) throws Exception {
         //Connection to setup elements
         terminalMenu = new TerminalMenu(primaryStage);
         terminalMenu.openWindow();
-        /*//activate before release
+        //$activate before release
         if(!Initializer.fullInit())
         {
             badInit();
-            terminalMenu.closeWindow();
-            primaryStage.close();
+            closeProgram();
             //Initializer.fullClose(); //FIX here
         }
         else
         {
             loadMainMenu(primaryStage);
         }
-        */
-        //ONLY FOR DEVELOPING!!!
-        Initializer.fullInit();
-        loadMainMenu(primaryStage);
+
+        //$ONLY FOR DEVELOPING!!!
+        //Initializer.fullInit();
+        //loadMainMenu(primaryStage);
     }
 
     private void badInit()
@@ -47,6 +51,7 @@ public class MainMenu extends Application {
     private void loadMainMenu(Stage primaryStage)
     {
         //Buttons
+        mainStage=primaryStage;
         Button terminal = new Button("Terminal");
         Button scan = new Button("Scan");
         Button calibration = new Button("Calibrate");
@@ -56,7 +61,12 @@ public class MainMenu extends Application {
                 terminalMenu.openWindow();
             }
         });
-        scan.setOnAction(new ScanMenu(primaryStage));
+        scan.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                ScanMenu.openWindow(primaryStage);
+            }
+        });
         calibration.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent event) {
                 CalibrationMenu.openDialog();
@@ -73,5 +83,25 @@ public class MainMenu extends Application {
         primaryStage.show();
         //Activate first calibration
         CalibrationMenu.openDialog();
+    }
+    public static void closeProgram()
+    {
+        ServiceProcessor.serviceMessage(FileManager.getDateTimeStamp(new Date()) + " #Session finish");
+        try
+        {
+            terminalMenu.closeWindow();
+        }
+        catch (NullPointerException e)
+        {
+
+        }
+        try
+        {
+            terminalMenu.closeWindow();
+        }
+        catch (NullPointerException e)
+        {
+
+        }
     }
 }

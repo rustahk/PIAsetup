@@ -1,42 +1,39 @@
 package backend.devices;
 
+import backend.core.ErrorProcessor;
 import jssc.SerialPortException;
 
 import java.io.IOException;
 
-public class Engine
-{
+public class Engine {
     private static Connection connection;
 
-    public static void init(Connection engine)
-    {
-        connection=engine;
+    public static void init(Connection engine) {
+        connection = engine;
     }
 
-    public static int sendCommand(int[] command) throws IOException, SerialPortException
-    {
+    public static int sendCommand(int[] command) throws SerialPortException, IOException, InterruptedException {
         int[] reply;
-        connection.sendMessage(command);
+        try {
+            connection.sendMessage(command);
+        } catch (SerialPortException e) {
+            ErrorProcessor.standartError("Engine connection problem", e);
+            throw e;
+        }
         reply = connection.getByteResponce();
-        if (!EngineByteCommands.commandStatus(command, reply)) throw new IOException();
+        if (!EngineByteCommands.commandStatus(command, reply)) {
+            IOException e = new IOException("Engine wrong responce");
+            ErrorProcessor.standartError("Engine responce problem", e);
+            throw e;
+        }
         return EngineByteCommands.getValue(reply);
     }
 
-    public static boolean waitMoving()
-    {
-        while (true)
-        {
-            try
-            {
-                if (sendCommand(EngineByteCommands.getSpeed()) == 0) break;
-                Thread.sleep(100);
-            }
-            catch (Exception e)
-            {
-                return false;
-            }
+    public static void waitMoving() throws SerialPortException, IOException, InterruptedException{
+        while (true) {
+            if (sendCommand(EngineByteCommands.getSpeed()) == 0) break;
+            Thread.sleep(100);
         }
-        return true;
     }
 
     public static Connection getConnection() {

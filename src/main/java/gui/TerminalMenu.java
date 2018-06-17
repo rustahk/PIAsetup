@@ -1,9 +1,7 @@
 package gui;
 
-import backend.core.ErrorProcessor;
-import backend.core.ErrorRecipient;
-import backend.core.ServiceProcessor;
-import backend.core.SystemRecipient;
+import backend.core.*;
+import backend.data.Point;
 import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -13,7 +11,8 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-public class TerminalMenu implements SystemRecipient, ErrorRecipient{
+public class TerminalMenu implements SystemRecipient, ErrorRecipient, PointRecipient
+{
 
     private static boolean windowStatus;
     private static TextArea textArea;
@@ -24,6 +23,7 @@ public class TerminalMenu implements SystemRecipient, ErrorRecipient{
     {
         ErrorProcessor.addErrorRecipient(this);
         ServiceProcessor.addSystemRecipient(this);
+        LogicCommands.addPointRecipient(this);
         terminalWindow = new Stage();
         terminalWindow.initModality(Modality.NONE);
         terminalWindow.initOwner(mainMenu);
@@ -61,5 +61,10 @@ public class TerminalMenu implements SystemRecipient, ErrorRecipient{
 
     public void serviceMessage(String msg) {
         addLine(msg);
+    }
+
+    public boolean newPoint(Point point) {
+        addLine("[SCAN]: " + point.getWavelenght() + " " + point.getValue());
+        return true;
     }
 }

@@ -5,21 +5,17 @@ import backend.core.LogicCommands;
 import backend.core.ServiceProcessor;
 import backend.data.Point;
 import backend.devices.Calibration;
-import javafx.event.EventHandler;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.DialogEvent;
 import javafx.scene.control.TextInputDialog;
-import javafx.stage.StageStyle;
-import javafx.stage.WindowEvent;
 
+import java.io.IOException;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
 public class CalibrationMenu {
 
     private static boolean calibrated;
-    private static boolean updated;
     private static Optional<String> result;
     private static TextInputDialog dialog;
 
@@ -29,9 +25,12 @@ public class CalibrationMenu {
         try {
             double value = Double.parseDouble(result.get());
             if (Calibration.positionLimit(value, false)) {
-                LogicCommands.calibratePosition(new Point(Calibration.positionCalc(value), value));
-                ServiceProcessor.serviceMessage("Position updated: " + value + " nm");
-                calibrated = true;
+                if(LogicCommands.calibratePosition(new Point(Calibration.positionCalc(value), value)))
+                {
+                    ServiceProcessor.serviceMessage("Position updated: " + value + " nm");
+                    calibrated = true;
+                }
+                noReply();
             } else {
                 outOfRange(value);
             }
@@ -77,7 +76,6 @@ public class CalibrationMenu {
     }
 
     private static void noUpdate() {
-        if (calibrated) {
             String warning = "Calibration is not updated";
             ServiceProcessor.serviceMessage(warning);
             Alert outoflimit_error = new Alert(Alert.AlertType.WARNING);
@@ -85,9 +83,6 @@ public class CalibrationMenu {
             outoflimit_error.setHeaderText(null);
             outoflimit_error.setContentText(warning);
             outoflimit_error.showAndWait();
-        } else {
-            //cancel();
-        }
     }
 
     private static void cancel() {
@@ -109,5 +104,18 @@ public class CalibrationMenu {
 
     private static void confirmedCancel() {
         ServiceProcessor.serviceMessage("First calibration has been canceled");
+        MainMenu.closeProgram();
     }
+    private static void noReply()
+    {
+        String error = "No reply from engine";
+        ErrorProcessor.standartError(error, new IOException());
+        Alert no_reply = new Alert(Alert.AlertType.ERROR);
+        no_reply.setTitle("Calibration error");
+        no_reply.setHeaderText(null);
+        no_reply.setContentText(error);
+        no_reply.showAndWait();
+        confirmedCancel();
+    }
+
 }

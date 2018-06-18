@@ -17,12 +17,15 @@ import java.util.Date;
 
 public class MainMenu extends Application {
     private static TerminalMenu terminalMenu;
+    private static ConnectionMenu connectionMenu;
     private static Stage mainStage;
 
     public void start(Stage primaryStage) throws Exception {
         //Connection to setup elements
         terminalMenu = new TerminalMenu(primaryStage);
         terminalMenu.openWindow();
+        connectionMenu = new ConnectionMenu();
+        connectionMenu.createWindow(primaryStage);
         //$activate before release
         /*if(!Initializer.fullInit())
         {
@@ -55,6 +58,7 @@ public class MainMenu extends Application {
         Button terminal = new Button("Terminal");
         Button scan = new Button("Scan");
         Button calibration = new Button("Calibrate");
+        Button connection = new Button("Connection");
         //Set button actions
         terminal.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent event) {
@@ -72,9 +76,15 @@ public class MainMenu extends Application {
                 CalibrationMenu.openDialog();
             }
         });
+        connection.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                connectionMenu.openWindow();
+            }
+        });
         //Elements order & style
         VBox vbox = new VBox();
-        vbox.getChildren().addAll(terminal, scan, calibration);
+        vbox.getChildren().addAll(terminal, scan, calibration, connection);
         vbox.setSpacing(10);
         vbox.setPadding(new Insets(10, 10, 10, 50));
         Scene scene = new Scene(vbox, 256, 256 + 128);

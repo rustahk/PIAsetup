@@ -82,7 +82,7 @@ public class MainMenu extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
         //Activate first calibration
-        CalibrationMenu.openDialog();
+        //$CalibrationMenu.openDialog();
     }
     public static void closeProgram()
     {

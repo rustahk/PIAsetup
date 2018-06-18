@@ -6,6 +6,7 @@ import backend.devices.*;
 import backend.files.FileManager;
 import backend.files.HotSave;
 import backend.files.StandartSave;
+import gui.ScanMenu;
 import jssc.SerialPortException;
 
 import java.io.IOException;
@@ -34,6 +35,7 @@ public class LogicCommands
             {
                 points[i] = scanPoint(start.getWavelenght() + (scanstep * i * direction), delay);
                 for(PointRecipient r : listeners) r.newPoint(points[i]);
+                ScanMenu.updateStatus(i, numpoints);
                 if(Thread.interrupted()) throw new InterruptedException();
             }
             catch (InterruptedException e)
@@ -88,7 +90,7 @@ public class LogicCommands
         //$Engine.waitMoving();
         Thread.sleep(delay);
         //$point.setValue(Lockin.sendCommand(LockinStringCommands.getOutputX()));
-        point.setValue(Math.random()*5+""); //$RANDOM_VALUES FOR TESTING
+        point.setValue(Math.sin(wavelenght/10)*5+""); //$RANDOM_VALUES FOR TESTING
         return point;
     }
 

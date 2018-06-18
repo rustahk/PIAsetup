@@ -32,7 +32,7 @@ public class CalibrationMenu {
                 }
                 noReply(); //Add exit to connection menu?
                 if(calibrated) noUpdate();
-                else MainMenu.closeProgram();
+                //$else confirmedCancel();
             } else {
                 outOfRange(value);
             }
@@ -117,7 +117,6 @@ public class CalibrationMenu {
         no_reply.setHeaderText(null);
         no_reply.setContentText(error);
         no_reply.showAndWait();
-        confirmedCancel();
     }
 
 }

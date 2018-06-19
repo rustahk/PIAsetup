@@ -22,13 +22,17 @@ public class LogicCommands
 
     public static Dataset startScan(Point start, Point finish, int numpoints, int delay)
     {
-        int direction = 1;
+        int direction = 1; //Scan direction (1 -> normal, -1 -> reverse)
         Point[] points = new Point[numpoints+1];
         if (start.getWavelenght() > finish.getWavelenght()) direction = -1;
-        double scanstep = Math.abs(finish.getWavelenght() - start.getWavelenght()) / numpoints;
+        double scanstep = Math.abs(finish.getWavelenght() - start.getWavelenght()) / numpoints; //calc delta wavelenght between points
+        //**Data saving
         Dataset dataset = new Dataset(points, new Date(), delay, scanstep);
         HotSave hotSave = new HotSave();
         hotSave.startHotSave(FileManager.getDateTimeStamp(dataset.getStarttime()));
+        //**Cleaning all buffers
+        Engine.getConnection().cleanInputBuffer();
+        Lockin.getConnection().cleanInputBuffer();
         for (int i = 0; i <= numpoints; i++)
         {
             try
@@ -46,7 +50,7 @@ public class LogicCommands
             catch (Exception e)
             {
                 ErrorProcessor.standartError("Scan interrupted: ", e);
-                //$break;
+                break;
             }
         }
         dataset.setFinishtime(new Date());
@@ -86,11 +90,16 @@ public class LogicCommands
     private static Point scanPoint(double wavelenght, int delay) throws IOException, SerialPortException, InterruptedException
     {
         Point point = new Point(wavelenght);
-        //$Engine.sendCommand(EngineByteCommands.moveTo(point.getPosition()));
-        //$Engine.waitMoving();
+        Engine.sendCommand(EngineByteCommands.moveTo(point.getPosition()));
+        Engine.waitMoving();
         Thread.sleep(delay);
-        //$point.setValue(Lockin.sendCommand(LockinStringCommands.getOutputX()));
-        point.setValue(Math.sin(wavelenght/10)*5+""); //$RANDOM_VALUES FOR TESTING
+        String value = Lockin.sendCommand(LockinStringCommands.getOutputX());
+        if (value.equals(""))
+        {
+            throw new IOException("no value from lockin");
+        }
+        point.setValue(value);
+        //point.setValue(Math.sin(wavelenght/10)*5+""); //$RANDOM_VALUES FOR TESTING
         return point;
     }
 

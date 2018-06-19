@@ -1,5 +1,6 @@
 package backend.devices;
 
+import backend.core.ErrorProcessor;
 import backend.core.ServiceProcessor;
 import jssc.SerialPort;
 import jssc.SerialPortEvent;
@@ -56,7 +57,6 @@ public class Connection {
         port.addEventListener(portreader, SerialPort.MASK_RXCHAR);
         status = true;
         ServiceProcessor.serviceMessage(portname + " connection: OK");
-
     }
 
     public void sendMessage(int[] message) throws SerialPortException {
@@ -76,6 +76,17 @@ public class Connection {
             }
         }
         return reply;
+    }
+    public void cleanInputBuffer()
+    {
+        try
+        {
+            portreader.cleanInput();
+        }
+        catch (NullPointerException e)
+        {
+            ErrorProcessor.standartError(this.portname + " reader wasn't open", e);
+        }
     }
 
     public String getStringResponce() throws IOException, InterruptedException {
@@ -104,7 +115,7 @@ public class Connection {
                         list.addLast(i);
                     }
                 } catch (SerialPortException e1) {
-                    System.out.println(e1);
+                    ErrorProcessor.standartError(Connection.this.portname, e1);
                 }
             }
         }
@@ -117,8 +128,9 @@ public class Connection {
             return null;
         }
 
-        public int getInputSize() {
-            return list.size();
+        public void cleanInput()
+        {
+            list = new LinkedList<Byte>();
         }
     }
 
@@ -130,9 +142,14 @@ public class Connection {
                 try {
                     list.addLast(port.readString(event.getEventValue()));
                 } catch (SerialPortException e1) {
-                    System.out.println(e1);
+                    ErrorProcessor.standartError(Connection.this.portname, e1);
                 }
             }
+        }
+
+        public void cleanInput()
+        {
+            list = new LinkedList<String>();
         }
 
         public int read() {
@@ -147,13 +164,13 @@ public class Connection {
             return message;
         }
 
-        public int getInputSize() {
-            return list.size();
-        }
     }
 
     private abstract class PortReader extends InputStream implements SerialPortEventListener {
         public abstract String readString();
+        public abstract void serialEvent(SerialPortEvent event);
+        public abstract void cleanInput();
+
     }
 }
 

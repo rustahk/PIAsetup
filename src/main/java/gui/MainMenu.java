@@ -26,8 +26,7 @@ public class MainMenu extends Application {
         terminalMenu.openWindow();
         connectionMenu = new ConnectionMenu();
         connectionMenu.createWindow(primaryStage);
-        //$activate before release
-        /*if(!Initializer.fullInit())
+        if(!Initializer.fullInit())
         {
             badInit();
             closeProgram();
@@ -36,11 +35,11 @@ public class MainMenu extends Application {
         else
         {
             loadMainMenu(primaryStage);
-        }*/
+        }
 
         //$ONLY FOR DEVELOPING!!!
-        Initializer.fullInit();
-        loadMainMenu(primaryStage);
+        //Initializer.fullInit();
+        //loadMainMenu(primaryStage);
     }
 
     private void badInit()
@@ -59,6 +58,7 @@ public class MainMenu extends Application {
         Button scan = new Button("Scan");
         Button calibration = new Button("Calibrate");
         Button connection = new Button("Connection");
+        connection.setDisable(true);//$
         //Set button actions
         terminal.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent event) {
@@ -92,7 +92,7 @@ public class MainMenu extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
         //Activate first calibration
-        //$CalibrationMenu.openDialog();
+        CalibrationMenu.openDialog();
     }
     public static void closeProgram()
     {
@@ -113,5 +113,17 @@ public class MainMenu extends Application {
         {
 
         }
+        try
+        {
+            Initializer.fullClose();
+        }
+        catch (Exception e)
+        {
+
+        }
+    }
+    public void stop()
+    {
+        closeProgram();
     }
 }

@@ -29,8 +29,6 @@ public class TerminalMenu implements SystemRecipient, ErrorRecipient, PointRecip
         terminalWindow.initOwner(mainMenu);
         terminalWindow.setTitle("Terminal");
         textArea = new TextArea();
-        //VBox vbox = new VBox(textArea);
-        //((Group)secondScene.getRoot()).getChildren().add(vbox);
         Scene secondScene = new Scene(textArea, 700, 256);
         terminalWindow.setScene(secondScene);
     }

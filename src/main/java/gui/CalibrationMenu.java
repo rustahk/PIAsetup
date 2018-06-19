@@ -30,9 +30,11 @@ public class CalibrationMenu {
                     ServiceProcessor.serviceMessage("Position updated: " + value + " nm");
                     calibrated = true;
                 }
-                noReply(); //Add exit to connection menu?
-                if(calibrated) noUpdate();
-                //$else confirmedCancel();
+                else {
+                    if(calibrated) noUpdate();
+                    else noReply(); //Add exit to connection menu?
+                    confirmedCancel();
+                }
             } else {
                 outOfRange(value);
             }

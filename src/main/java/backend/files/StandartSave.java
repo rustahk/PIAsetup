@@ -1,6 +1,7 @@
 package backend.files;
 
 import backend.core.ErrorProcessor;
+import backend.core.ServiceProcessor;
 import backend.data.Dataset;
 import backend.data.Point;
 
@@ -28,6 +29,7 @@ public class StandartSave
         {
             return false;
         }
+        ServiceProcessor.serviceMessage("Scan saved: " + scanfile.getName());
         return true;
     }
 

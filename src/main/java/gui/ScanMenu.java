@@ -6,6 +6,8 @@ import backend.core.PointRecipient;
 import backend.core.ServiceProcessor;
 import backend.data.Point;
 import backend.devices.Calibration;
+import backend.devices.Engine;
+import backend.devices.EngineByteCommands;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
@@ -23,6 +25,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import jssc.SerialPortException;
 
 public class ScanMenu implements PointRecipient {
     private static TextField start_field;
@@ -90,6 +93,14 @@ public class ScanMenu implements PointRecipient {
             @Override
             public void handle(ActionEvent event) {
                 scan_task.cancel(true);
+                try
+                {
+                    Engine.sendCommand(EngineByteCommands.motorStop());
+                }
+                catch (Exception e)
+                {
+                    ErrorProcessor.standartError("Fail to stop engine", e);
+                }
 
             }
         });
@@ -190,6 +201,7 @@ public class ScanMenu implements PointRecipient {
     public boolean newPoint(Point e) {
         Platform.runLater(new Runnable() {
             public void run() {
+                //!!!
                 current_series.getData().add(new ScatterChart.Data<Number, Number>(e.getWavelenght(), Double.parseDouble(e.getValue())));
             }
         });

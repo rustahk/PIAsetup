@@ -18,6 +18,7 @@ public class CalibrationMenu {
     private static boolean calibrated;
     private static Optional<String> result;
     private static TextInputDialog dialog;
+    private static String error_title = "Calibration error";
 
     public static void openDialog() {
         dialog = new TextInputDialog("Calibration");
@@ -32,68 +33,30 @@ public class CalibrationMenu {
                 }
                 else {
                     if(calibrated) noUpdate();
-                    else noReply(); //Add exit to connection menu?
+                    else MainMenu.errorMessage(error_title, "No reply from engine", null, new IOException("No reply from enfine"));; //Add exit to connection menu?
                     confirmedCancel();
                 }
             } else {
-                outOfRange(value);
+                MainMenu.errorMessage(error_title, "[CRITICAL] Position " + value + "nm is out of workrange",null, new NumberFormatException("out of range"));
+                CalibrationMenu.openDialog();
             }
         } catch (NumberFormatException e) {
-            notDouble(e);
+            MainMenu.errorMessage(error_title,"This is not a DOUBLE value",e.toString(), e);
+            CalibrationMenu.openDialog();
         } catch (NoSuchElementException e) {
             if (calibrated) noUpdate();
             else cancel();
         }
     }
 
-    private static void outOfRange(double wavelenght) {
-        String error = "[CRITICAL] Position " + wavelenght + "nm is out of workrange";
-        ErrorProcessor.standartError(error, new NumberFormatException());
-        Alert outoflimit_error = new Alert(Alert.AlertType.ERROR);
-        outoflimit_error.setTitle("Calibration error");
-        outoflimit_error.setHeaderText(null);
-        outoflimit_error.setContentText(error);
-        outoflimit_error.showAndWait();
-        CalibrationMenu.openDialog();
-    }
-
-    private static void notDouble(NumberFormatException e) {
-        String error = "This is not a DOUBLE value";
-        ErrorProcessor.standartError(error, e);
-        Alert not_double = new Alert(Alert.AlertType.ERROR);
-        not_double.setTitle("Calibration error");
-        not_double.setHeaderText(null);
-        not_double.setContentText(error);
-        not_double.showAndWait();
-        CalibrationMenu.openDialog();
-    }
-
-    private static void noValue(NoSuchElementException e) {
-        String error = "[CRITICAL] Engine must be calibrated";
-        ErrorProcessor.standartError(error, e);
-        Alert no_value = new Alert(Alert.AlertType.ERROR);
-        no_value.setTitle("Calibration error");
-        no_value.setHeaderText(null);
-        no_value.setContentText(error);
-        no_value.showAndWait();
-        CalibrationMenu.openDialog();
-    }
-
     private static void noUpdate() {
-            String warning = "Calibration is not updated";
-            ServiceProcessor.serviceMessage(warning);
-            Alert outoflimit_error = new Alert(Alert.AlertType.WARNING);
-            outoflimit_error.setTitle("Calibration error");
-            outoflimit_error.setHeaderText(null);
-            outoflimit_error.setContentText(warning);
-            outoflimit_error.showAndWait();
+            MainMenu.warningMessage("Calibration", "Calibration is not updated", null);
     }
 
     private static void cancel() {
         Alert confirm_cancel = new Alert(Alert.AlertType.CONFIRMATION);
         confirm_cancel.setTitle("First calibration");
-        confirm_cancel.setHeaderText(null);
-        confirm_cancel.setContentText("You must enter actual position before using the setup \nConfirm to close application?");
+        confirm_cancel.setHeaderText("You must enter actual position before using the setup \nConfirm to close application?");
         Optional<ButtonType> option = confirm_cancel.showAndWait();
         if (option.get() == null) {
             confirmedCancel();
@@ -110,15 +73,4 @@ public class CalibrationMenu {
         ServiceProcessor.serviceMessage("First calibration has been canceled");
         MainMenu.closeProgram();
     }
-    private static void noReply()
-    {
-        String error = "No reply from engine";
-        ErrorProcessor.standartError(error, new IOException());
-        Alert no_reply = new Alert(Alert.AlertType.ERROR);
-        no_reply.setTitle("Calibration error");
-        no_reply.setHeaderText(null);
-        no_reply.setContentText(error);
-        no_reply.showAndWait();
-    }
-
 }

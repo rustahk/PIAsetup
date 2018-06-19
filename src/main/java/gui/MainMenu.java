@@ -1,5 +1,6 @@
 package gui;
 
+import backend.core.ErrorProcessor;
 import backend.core.Initializer;
 import backend.core.ServiceProcessor;
 import backend.files.FileManager;
@@ -20,40 +21,27 @@ public class MainMenu extends Application {
     private static ConnectionMenu connectionMenu;
     private static Stage mainStage;
 
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage)
+    {
         //Connection to setup elements
         terminalMenu = new TerminalMenu(primaryStage);
         terminalMenu.openWindow();
         connectionMenu = new ConnectionMenu();
         connectionMenu.createWindow(primaryStage);
-        if(!Initializer.fullInit())
+        try
         {
-            badInit();
-            closeProgram();
-            //Initializer.fullClose(); //FIX here
-        }
-        else
-        {
+            Initializer.fullInit();
             loadMainMenu(primaryStage);
+        } catch (Exception e) {
+            errorMessage("Initialization", "Initialization fail", "Application will be closed: " + e.toString(), null);
+            closeProgram();
         }
 
-        //$ONLY FOR DEVELOPING!!!
-        //Initializer.fullInit();
-        //loadMainMenu(primaryStage);
     }
 
-    private void badInit()
-    {
-        Alert init_error = new Alert(Alert.AlertType.ERROR);
-        init_error.setTitle("Initialization error");
-        init_error.setHeaderText(null);
-        init_error.setContentText("Initialization fail\nApplication will be closed");
-        init_error.showAndWait();
-    }
-    private void loadMainMenu(Stage primaryStage)
-    {
+    private void loadMainMenu(Stage primaryStage) {
         //Buttons
-        mainStage=primaryStage;
+        mainStage = primaryStage;
         Button terminal = new Button("Terminal");
         Button scan = new Button("Scan");
         Button calibration = new Button("Calibrate");
@@ -94,36 +82,42 @@ public class MainMenu extends Application {
         //Activate first calibration
         CalibrationMenu.openDialog();
     }
-    public static void closeProgram()
-    {
+
+    public static void closeProgram() {
+        Initializer.fullClose();
         ServiceProcessor.serviceMessage(FileManager.getDateTimeStamp(new Date()) + " #Session finish");
-        try
-        {
+                try {
             terminalMenu.closeWindow();
-        }
-        catch (NullPointerException e)
-        {
+        } catch (NullPointerException e) {
 
         }
-        try
-        {
+        try {
             mainStage.close();
-        }
-        catch (NullPointerException e)
-        {
-
-        }
-        try
-        {
-            Initializer.fullClose();
-        }
-        catch (Exception e)
-        {
+        } catch (NullPointerException e) {
 
         }
     }
-    public void stop()
-    {
+
+    public void stop() {
         closeProgram();
+    }
+
+    public static void errorMessage(String error_title, String error_msg, String content_text, Exception e) {
+        if(e!=null) ErrorProcessor.standartError(error_msg, e);
+        else ServiceProcessor.serviceMessage(error_title + " " + error_msg);
+        Alert error_alert = new Alert(Alert.AlertType.ERROR);
+        error_alert.setTitle(error_title);
+        error_alert.setHeaderText(error_msg);
+        error_alert.setContentText(content_text);
+        error_alert.showAndWait();
+    }
+
+    public static void warningMessage(String warning_title, String warning_msg, String content_text) {
+        ServiceProcessor.serviceMessage(warning_msg);
+        Alert warining = new Alert(Alert.AlertType.WARNING);
+        warining.setTitle(warning_title);
+        warining.setHeaderText(warning_msg);
+        warining.setContentText(content_text);
+        warining.showAndWait();
     }
 }

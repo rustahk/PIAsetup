@@ -19,7 +19,7 @@ public class TerminalMenu implements SystemRecipient, ErrorRecipient, PointRecip
     private static Stage terminalWindow;
 
 
-    public TerminalMenu(Stage mainMenu) throws Exception
+    public TerminalMenu(Stage mainMenu)
     {
         ErrorProcessor.addErrorRecipient(this);
         ServiceProcessor.addSystemRecipient(this);

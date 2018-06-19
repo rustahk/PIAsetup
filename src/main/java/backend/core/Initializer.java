@@ -14,64 +14,67 @@ public class Initializer {
     private static Connection lockin_connection;
     private static Configurator config;
 
-    public static boolean fullInit() throws Exception {
-        if(!initLogger()) return false;
-        if(!initConfig()) return false;
-        if(!initEngine()) return false;
-        if(!initLockin()) return false;
-        return true;
+    public static void fullInit() throws Exception {
+        initLogger();
+        initConfig();
+        initEngine();
+        initLockin();
     }
 
-    public static boolean fullClose() {
-        try {
-            engine_connection.disconnect();
-            lockin_connection.disconnect();
-            return true;
-        } catch (SerialPortException e) {
-            ErrorProcessor.standartError("fullClose ", e);
-            return false;
+    public static void fullClose() {
+
+        if(engine_connection!=null){
+            try {
+                engine_connection.disconnect();
+            } catch (Exception e) {
+                ErrorProcessor.standartError(engine_connection.getPortname() + " not closed", e);
+            }
         }
+        if(lockin_connection!=null){
+            try {
+                lockin_connection.disconnect();
+            } catch (Exception e) {
+                ErrorProcessor.standartError(lockin_connection.getPortname() + " not closed", e);
+            }
+        }
+
     }
 
-    public static boolean initLogger() {
+    public static void initLogger() throws Exception {
         try {
             FileManager.init();
             Logger.init();
         } catch (Exception e) {
             ErrorProcessor.standartError("Logger: FAIL", e);
-            return false;
+            throw e;
         }
         ServiceProcessor.serviceMessage("Logger: OK");
-        return true;
     }
 
-    public static boolean initConfig() {
+    public static void initConfig() throws Exception {
         try {
             config = new Configurator();
             config.loadConfig();
         } catch (Exception e) {
             ErrorProcessor.standartError("Config: FAIL", e);
-            return false;
+            throw e;
         }
         ServiceProcessor.serviceMessage("Config: OK");
-        return true;
     }
 
-    public static boolean initEngine() throws SerialPortException {
+    public static void initEngine() throws Exception {
         try {
             engine_connection = new Connection(config.getEngine_port(), config.getEngine_baud(), config.getEngine_databits(), config.getEngine_stopbit(), config.getEngine_parity(), 9, false, config.getEngine_delay());
             Engine.init(engine_connection);
             engine_connection.connect();
         } catch (Exception e) {
             ErrorProcessor.standartError("Engine: FAIL", e);
-            return false;
+            throw e;
         }
         ServiceProcessor.serviceMessage("Engine: OK");
-        return true;
-
     }
 
-    public static boolean initLockin() throws SerialPortException, NullPointerException {
+    public static void initLockin() throws Exception {
 
         try {
             lockin_connection = new Connection(config.getLockin_port(), config.getLockin_baud(), config.getLockin_databits(), config.getLockin_stopbit(), config.getLockin_parity(), 0, true, config.getLockin_delay());
@@ -80,9 +83,8 @@ public class Initializer {
             Lockin.sendCommand(LockinStringCommands.setOutInterface());
         } catch (Exception e) {
             ErrorProcessor.standartError("Lockin: FAIL", e);
-            return false;
+            throw e;
         }
         ServiceProcessor.serviceMessage("Lockin: OK");
-        return true;
     }
 }

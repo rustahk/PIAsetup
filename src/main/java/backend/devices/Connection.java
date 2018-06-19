@@ -94,6 +94,10 @@ public class Connection {
         return portreader.readString();
     }
 
+    public String getPortname() {
+        return portname;
+    }
+
     public void disconnect() throws SerialPortException {
         if (status) {
             port.closePort();

@@ -27,6 +27,8 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import jssc.SerialPortException;
 
+import java.util.Optional;
+
 public class ScanMenu implements PointRecipient {
     private static TextField start_field;
     private static TextField finish_field;
@@ -93,12 +95,9 @@ public class ScanMenu implements PointRecipient {
             @Override
             public void handle(ActionEvent event) {
                 scan_task.cancel(true);
-                try
-                {
+                try {
                     Engine.sendCommand(EngineByteCommands.motorStop());
-                }
-                catch (Exception e)
-                {
+                } catch (Exception e) {
                     ErrorProcessor.standartError("Fail to stop engine", e);
                 }
 
@@ -107,12 +106,20 @@ public class ScanMenu implements PointRecipient {
         scanWindow.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override
             public void handle(WindowEvent event) {
-                try
-                {
-                    scan_task.cancel(true);
+                try {
+                    if (scan_task.isRunning()) {
+                        Alert confirm_exit = new Alert(Alert.AlertType.CONFIRMATION);
+                        confirm_exit.setTitle("Stop scan");
+                        confirm_exit.setHeaderText("Confirm to stop scan?");
+                        Optional<ButtonType> option = confirm_exit.showAndWait();
+                        if (option.get() == ButtonType.OK) {
+                            scan_task.cancel(true);
+                        } else {
+                            event.consume();
+                        }
+                    }
                 }
-                catch (NullPointerException e)
-                {
+                catch (NullPointerException e) {
                     //Nothing, it means that task doesn't exist
                 }
             }

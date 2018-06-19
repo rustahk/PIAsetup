@@ -94,7 +94,7 @@ public class LogicCommands
         Engine.waitMoving();
         Thread.sleep(delay);
         String value = Lockin.sendCommand(LockinStringCommands.getOutputX());
-        if (value.equals(""))
+        if (value.equals("")) //This is here, because usually Lockin hasn't answer
         {
             throw new IOException("no value from lockin");
         }

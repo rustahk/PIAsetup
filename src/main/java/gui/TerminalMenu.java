@@ -62,7 +62,7 @@ public class TerminalMenu implements SystemRecipient, ErrorRecipient, PointRecip
     }
 
     public boolean newPoint(Point point) {
-        addLine("[SCAN]: " + point.getWavelenght() + " " + point.getValue());
+        addLine("[SCAN]: " + point.getWavelenght() + " " + point.getValueX()+ " " + point.getValueY());
         return true;
     }
 }

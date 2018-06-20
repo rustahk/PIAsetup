@@ -157,11 +157,11 @@ public class ConsoleProcessor {
             if (nm) {
                 output.unloggedMessage("POSITION (0..1000) nm: ");
                 inDouble = enterDouble();
-                point = new Point(Calibration.positionCalc(inDouble), inDouble);
+                point = new Point(inDouble);
             } else {
                 output.unloggedMessage("POSITION (" + Calibration.getMinwstep() + ".." + Calibration.getMaxwstep() + "): ");
                 inInt = enterInt();
-                point = new Point(inInt, Calibration.wavelenghtCalc(inInt));
+                point = new Point(Calibration.positionCalc(inInt),inInt);
             }
             if (Calibration.positionLimit(point.getPosition(), false)) break; //check 0 and 1000nm
             else {

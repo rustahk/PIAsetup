@@ -37,7 +37,8 @@ public class ScanMenu implements PointRecipient {
     private static Button start_button;
     private static Button stop_button;
     private static ProgressBar progressBar;
-    private static XYChart.Series current_series;
+    private static ScatterChart.Series<Number, Number> X_series;
+    private static ScatterChart.Series<Number, Number> Y_series;
     private static Scanning scan_task;
 
     public static void openWindow(Stage primaryStage) {
@@ -51,8 +52,15 @@ public class ScanMenu implements PointRecipient {
         //**Scatter**
         ScatterChart<Number, Number> sc = new ScatterChart<Number, Number>(xAxis, yAxis);
         sc.setTitle("Detected signal");
-        current_series = new XYChart.Series();
-        sc.getData().addAll(current_series);
+        //X_series = new XYChart.Series();
+        //Y_series = new XYChart.Series();
+        X_series = new ScatterChart.Series<Number, Number>();
+        Y_series = new ScatterChart.Series<Number, Number>();
+        X_series.setName("X signal component");
+        Y_series.setName("Y signal component");
+        X_series.getData().add(new ScatterChart.Data<Number, Number>(0, 0)); //Labels dosen't work withot that
+        Y_series.getData().add(new ScatterChart.Data<Number, Number>(0, 0)); //Labels dosen't work withot that
+        sc.getData().addAll(X_series, Y_series);
         //Real-time plotting
         LogicCommands.addPointRecipient(new ScanMenu());
         //**Parameters elements**
@@ -125,6 +133,7 @@ public class ScanMenu implements PointRecipient {
             }
         });
         //Show
+        clearPlot();
         scanWindow.show();
     }
 
@@ -208,8 +217,8 @@ public class ScanMenu implements PointRecipient {
     public boolean newPoint(Point e) {
         Platform.runLater(new Runnable() {
             public void run() {
-                //!!!
-                current_series.getData().add(new ScatterChart.Data<Number, Number>(e.getWavelenght(), Double.parseDouble(e.getValue())));
+                X_series.getData().add(new ScatterChart.Data<Number, Number>(e.getWavelenght(), Double.parseDouble(e.getValueX())));
+                Y_series.getData().add(new ScatterChart.Data<Number, Number>(e.getWavelenght(), Double.parseDouble(e.getValueY())));
             }
         });
         return true;
@@ -230,12 +239,12 @@ public class ScanMenu implements PointRecipient {
 
         @Override
         protected Void call() throws Exception {
-            current_series.getData().clear();
+            clearPlot();
             ServiceProcessor.serviceMessage("Scan parameters: start " + start.getWavelenght() + " finish " + finish.getWavelenght() + " points " + numpoints + " delay " + delay);
             progressBar.setDisable(false);
             start_button.setDisable(true);
             stop_button.setDisable(false);
-            LogicCommands.startScan(start, finish, numpoints, delay);
+            LogicCommands.saveScan(LogicCommands.startScan(start, finish, numpoints, delay));
             return null;
         }
 
@@ -246,5 +255,11 @@ public class ScanMenu implements PointRecipient {
 
     public static void updateStatus(double workDone, double total) {
         if (scan_task != null) scan_task.updateInnerStatus(workDone, total);
+    }
+
+    private static void clearPlot()
+    {
+        X_series.getData().clear();
+        Y_series.getData().clear();
     }
 }

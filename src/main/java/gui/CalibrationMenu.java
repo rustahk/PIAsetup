@@ -26,7 +26,7 @@ public class CalibrationMenu {
         try {
             double value = Double.parseDouble(result.get());
             if (Calibration.positionLimit(value, false)) {
-                if(LogicCommands.calibratePosition(new Point(Calibration.positionCalc(value), value)))
+                if(LogicCommands.calibratePosition(new Point(value)))
                 {
                     ServiceProcessor.serviceMessage("Position updated: " + value + " nm");
                     calibrated = true;

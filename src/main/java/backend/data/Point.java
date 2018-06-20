@@ -7,7 +7,9 @@ public class Point
 {
     private int position;//position in steps
     private double wavelenght;//position in nm
-    private String value;//measured value //Saved like string to avoid troubles with noise/wrong read from port
+    //measured values //Saved like string to avoid troubles with noise/wrong read from port
+    private String valueX;
+    private String valueY;
 
     public int getPosition() {
         return position;
@@ -17,22 +19,27 @@ public class Point
         return wavelenght;
     }
 
-    public String getValue() {
-        return value;
+    public String getValueX() {
+        return valueX;
     }
 
-    public void setValue(String value) {
-        this.value = value;
+    public void setValue(String x, String y) {
+        this.valueX = x;
+        this.valueY = y;
+    }
+
+    public String getValueY() {
+        return valueY;
     }
 
     public Point(int position, double wavelenght) {
         this.position = position;
         this.wavelenght = wavelenght;
-        this.setValue(null);
+        //this.setValue(null, null);
     }
     public Point(double wavelenght) {
         this.position = Calibration.positionCalc(wavelenght);
         this.wavelenght = wavelenght;
-        this.setValue(null);
+        //this.setValue(null, null);
     }
 }

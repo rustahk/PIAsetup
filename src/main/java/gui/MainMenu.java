@@ -13,6 +13,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import jssc.SerialPortException;
 
 import java.util.Date;
 
@@ -31,9 +32,15 @@ public class MainMenu extends Application {
         try
         {
             Initializer.fullInit();
-            loadMainMenu(primaryStage);
-        } catch (Exception e) {
-            errorMessage("Initialization", "Initialization fail", "Application will be closed: " + e.toString(), null);
+            loadMainMenu(primaryStage);//$
+        } catch (SerialPortException e) {
+            errorMessage("Initialization", "Connection fail", "Application will be closed: " + e.toString(), null);
+            closeProgram();//$
+            //$loadMainMenu(primaryStage);
+        }
+        catch (Exception e)
+        {
+            errorMessage("Initialization", "Critical error", "Application will be closed: " + e.toString(), e);
             closeProgram();
         }
 
@@ -80,7 +87,8 @@ public class MainMenu extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
         //Activate first calibration
-        CalibrationMenu.openDialog();
+        CalibrationMenu.openDialog();//$
+        //connectionMenu.openWindow();
     }
 
     public static void closeProgram() {

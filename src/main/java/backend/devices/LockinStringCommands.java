@@ -27,4 +27,8 @@ There is no checksum!
     private static String getOutputValue() {
         return "OUTP ? ";
     }
+
+    public static String getOutputXY() {
+        return "SNAP?1,2";
+    }
 }

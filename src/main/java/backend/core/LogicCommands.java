@@ -93,12 +93,13 @@ public class LogicCommands
         Engine.sendCommand(EngineByteCommands.moveTo(point.getPosition()));
         Engine.waitMoving();
         Thread.sleep(delay);
-        String value = Lockin.sendCommand(LockinStringCommands.getOutputX());
+        String value = Lockin.sendCommand(LockinStringCommands.getOutputXY());
         if (value.equals("")) //This is here, because usually Lockin hasn't answer
         {
             throw new IOException("no value from lockin");
         }
-        point.setValue(value);
+        String[] xy = value.split(",");
+        point.setValue(xy[0],xy[1]);
         //point.setValue(Math.sin(wavelenght/10)*5+""); //$RANDOM_VALUES FOR TESTING
         return point;
     }

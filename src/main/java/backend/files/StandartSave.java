@@ -14,7 +14,7 @@ public class StandartSave {
     public static boolean saveDataset(Dataset dataset) {
         File scanfile;
         try {
-            scanfile = new File(FileManager.mainfile.getAbsolutePath(), FileManager.convertToFileName(FileManager.getDateTimeStamp(dataset.getStarttime())) + " Scan.txt");
+            scanfile = new File(FileManager.mainfile.getAbsolutePath(), FileManager.convertToFileName(FileManager.getDateTimeStamp(dataset.getStarttime())) +" " + dataset.getSample_name() +" Scan.txt");
             scanfile.createNewFile();
             FileWriter scanwriter = new FileWriter(scanfile, false);
             scanwriter.write(scanHead(dataset));

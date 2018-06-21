@@ -85,13 +85,13 @@ public class Configurator {
         props.setProperty("engine_databits", "8");
         props.setProperty("engine_stopbit", "1");
         props.setProperty("engine_parity", "0");
-        props.setProperty("engine_delay", "10");
+        props.setProperty("engine_delay", "25");
         props.setProperty("lockin_port", "COM5");
-        props.setProperty("lockin_baud", "9600");
+        props.setProperty("lockin_baud", "19200");
         props.setProperty("lockin_databits", "8");
         props.setProperty("lockin_stopbit", "1");
         props.setProperty("lockin_parity", "0");
-        props.setProperty("lockin_delay", "10");
+        props.setProperty("lockin_delay", "75");
     }
 
     private void rewriteConfigFile() {

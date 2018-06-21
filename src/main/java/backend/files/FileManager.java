@@ -54,6 +54,6 @@ public class FileManager {
 
     public static void addPointToFile(FileWriter writer, Point point) throws IOException
     {
-        FileManager.addLineToFile(writer, point.getWavelenght() + "; " + point.getValueX()+ "; " + point.getValueY());
+        FileManager.addLineToFile(writer, point.getWavelenght() + "\t" + point.getValueX()+ "\t" + point.getValueY());
     }
 }

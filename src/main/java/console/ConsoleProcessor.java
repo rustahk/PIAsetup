@@ -113,7 +113,14 @@ public class ConsoleProcessor {
         numpoints = enterInt();
         output.unloggedMessage("Delay(ms): ");
         delay = enterInt();
-        LogicCommands.saveScan(LogicCommands.startScan(start, finish, numpoints, delay));
+        try
+        {
+            LogicCommands.saveScan(LogicCommands.startScan("" ,start, finish, numpoints, delay));
+        }
+        catch (Exception e)
+        {
+            ErrorProcessor.standartError("Scan fail", e);
+        }
     }
 
     private static void calibr()

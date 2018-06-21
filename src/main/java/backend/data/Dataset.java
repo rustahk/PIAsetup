@@ -12,12 +12,14 @@ public class Dataset {
     private Date finishtime;
     private int delay;
     private double step;
+    private String sample_name;
 
-    public Dataset(Point[] points, Date starttime, int delay, double step) {
+    public Dataset(String sample_name, Point[] points, Date starttime, int delay, double step) {
         this.points = points;
         this.starttime = starttime;
         this.delay = delay;
         this.step = step;
+        this.sample_name = sample_name;
     }
 
     public void setFinishtime(Date finishtime) {
@@ -42,5 +44,9 @@ public class Dataset {
 
     public double getStep() {
         return step;
+    }
+
+    public String getSample_name() {
+        return sample_name;
     }
 }

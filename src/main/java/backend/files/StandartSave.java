@@ -9,11 +9,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-public class StandartSave
-{
+public class StandartSave {
 
-    public static boolean saveDataset(Dataset dataset)
-    {
+    public static boolean saveDataset(Dataset dataset) {
         File scanfile;
         try {
             scanfile = new File(FileManager.mainfile.getAbsolutePath(), FileManager.convertToFileName(FileManager.getDateTimeStamp(dataset.getStarttime())) + " Scan.txt");
@@ -25,8 +23,8 @@ public class StandartSave
             }
             scanwriter.flush();
             scanwriter.close();
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
+            ErrorProcessor.standartError("Fail to save file", e);
             return false;
         }
         ServiceProcessor.serviceMessage("Scan saved: " + scanfile.getName());
@@ -34,12 +32,15 @@ public class StandartSave
     }
 
     private static String scanHead(Dataset dataset) {
-        String line1 = "START: " + FileManager.getDateTimeStamp(dataset.getStarttime()) + "\r\n";
-        String line2 = "FINISH: " + FileManager.getDateTimeStamp(dataset.getFinishtime()) + "\r\n";
-        String line3 = "DELAY: " + dataset.getDelay() + "\r\n";
-        String line4 = "STEP: " + dataset.getStep() + "\r\n";
-        String line5 = "TOTAL NUMBER OF POINTS: " + dataset.getPoints().length + "\r\n";
-        return line1 + line2 + line3 + line4 + line5;
+        String header =
+                "%SAMPLE: " + dataset.getSample_name() + "\r\n" +
+                        "%START: " + FileManager.getDateTimeStamp(dataset.getStarttime()) + "\r\n" +
+                        "%FINISH: " + FileManager.getDateTimeStamp(dataset.getFinishtime()) + "\r\n" +
+                        "%DELAY: " + dataset.getDelay() + "\r\n" +
+                        "%STEP: " + dataset.getStep() + "\r\n" +
+                        "%TOTAL NUMBER OF POINTS: " + dataset.getPoints().length + "\r\n" +
+                        "%nm, singal_x, signal_y" + "\r\n";
+        return header;
     }
 
 }

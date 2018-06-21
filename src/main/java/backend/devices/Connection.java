@@ -77,7 +77,7 @@ public class Connection {
         }
         return reply;
     }
-    public void cleanInputBuffer()
+    public void cleanInputBuffer() throws NullPointerException
     {
         try
         {
@@ -86,6 +86,7 @@ public class Connection {
         catch (NullPointerException e)
         {
             ErrorProcessor.standartError(this.portname + " reader wasn't open", e);
+            throw e;
         }
     }
 
@@ -168,6 +169,57 @@ public class Connection {
             return message;
         }
 
+    }
+
+    private class CharPortReader extends PortReader {
+        LinkedList<Character> list = new LinkedList<Character>();
+
+        @Override
+        public String readString() {
+            String msg = "";
+            while(true)
+            {
+                while(list.size() == 0)
+                {
+                    try
+                    {
+                        Thread.sleep(10);
+                    }
+                    catch (InterruptedException e)
+                    {
+                        ErrorProcessor.standartError("Reading interrupted", e);
+                        return null;
+                    }
+                }
+                char i = list.poll();
+                msg+=i;
+                if(i == '\r') break;
+            }
+            return msg;
+        }
+
+        @Override
+        public void serialEvent(SerialPortEvent event) {
+            if (event.isRXCHAR() && event.getEventValue() > 0) {
+                try {
+                    for (char i : port.readString(event.getEventValue()).toCharArray()) {
+                        list.addLast(i);
+                    }
+                } catch (SerialPortException e1) {
+                    ErrorProcessor.standartError(Connection.this.portname, e1);
+                }
+            }
+        }
+
+        @Override
+        public void cleanInput() {
+            list = new LinkedList<Character>();
+        }
+
+        @Override
+        public int read() {
+            return 0;
+        }
     }
 
     private abstract class PortReader extends InputStream implements SerialPortEventListener {

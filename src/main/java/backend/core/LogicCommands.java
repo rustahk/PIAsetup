@@ -6,6 +6,7 @@ import backend.devices.*;
 import backend.files.FileManager;
 import backend.files.HotSave;
 import backend.files.StandartSave;
+import gui.MainMenu;
 import gui.ScanMenu;
 import jssc.SerialPortException;
 
@@ -20,38 +21,34 @@ public class LogicCommands
 {
     private static List<PointRecipient> listeners = new ArrayList<PointRecipient>();
 
-    public static Dataset startScan(Point start, Point finish, int numpoints, int delay)
+    public static Dataset startScan(String sample_name, Point start, Point finish, int numpoints, int delay) throws Exception
     {
         int direction = 1; //Scan direction (1 -> normal, -1 -> reverse)
         Point[] points = new Point[numpoints+1];
         if (start.getWavelenght() > finish.getWavelenght()) direction = -1;
         double scanstep = Math.abs(finish.getWavelenght() - start.getWavelenght()) / numpoints; //calc delta wavelenght between points
         //**Data saving
-        Dataset dataset = new Dataset(points, new Date(), delay, scanstep);
+        Dataset dataset = new Dataset(sample_name, points, new Date(), delay, scanstep);
         HotSave hotSave = new HotSave();
         hotSave.startHotSave(FileManager.getDateTimeStamp(dataset.getStarttime()));
         //**Cleaning all buffers
-        Engine.getConnection().cleanInputBuffer();
-        Lockin.getConnection().cleanInputBuffer();
-        for (int i = 0; i <= numpoints; i++)
-        {
-            try
-            {
-                points[i] = scanPoint(start.getWavelenght() + (scanstep * i * direction), delay);
-                for(PointRecipient r : listeners) r.newPoint(points[i]);
-                ScanMenu.updateStatus(i, numpoints);
-                if(Thread.interrupted()) throw new InterruptedException();
+        try {
+            Engine.getConnection().cleanInputBuffer();
+            Lockin.getConnection().cleanInputBuffer();
+            for (int i = 0; i <= numpoints; i++) {
+
+                    points[i] = scanPoint(start.getWavelenght() + (scanstep * i * direction), delay);
+                    for (PointRecipient r : listeners) r.newPoint(points[i]);
+                    ScanMenu.updateStatus(i, numpoints);
+                    if (Thread.interrupted()) throw new InterruptedException();
             }
-            catch (InterruptedException e)
-            {
-                ServiceProcessor.serviceMessage("Scan interrupted by user");
-                break;
-            }
-            catch (Exception e)
-            {
-                ErrorProcessor.standartError("Scan interrupted: ", e);
-                break;
-            }
+        }
+        catch (InterruptedException e) {
+            ServiceProcessor.serviceMessage("Scan interrupted by user");
+            throw e;
+        } catch (Exception e) {
+            ErrorProcessor.standartError("Scan interrupted: ", e);
+            throw e;
         }
         dataset.setFinishtime(new Date());
         hotSave.stopHotSave(FileManager.getDateTimeStamp(dataset.getFinishtime()));
@@ -112,5 +109,15 @@ public class LogicCommands
     public static void removePointRecipient(PointRecipient toRemove)
     {
         if(listeners.size()>0)listeners.remove(toRemove);
+    }
+    public static void moveTo(Point target)
+    {
+        try {
+            Engine.sendCommand(EngineByteCommands.moveTo(target.getPosition()));
+        }
+        catch (Exception e)
+        {
+            MainMenu.errorMessage("Engine", "Fail to move", e.toString(), e);
+        }
     }
 }

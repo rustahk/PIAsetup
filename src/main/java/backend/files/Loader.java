@@ -15,9 +15,9 @@ public class Loader {
         try
         {
             lines = readFile(scanfile);
-            for(String i : lines)
+            for(int i = 0; i<lines.size(); i++)
             {
-                System.out.println(i);
+                //if(lines.get(i).equals(""))
             }
         }
         catch (IOException e)

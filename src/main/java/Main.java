@@ -15,8 +15,8 @@ public class Main {
         //args = new String[1];
 
         if (args.length == 0) {
-            startGUI(); //default GUI interface
-            //$ Loader.loadDataset(new File("C:\\pia test data\\2018.06.22 155701 testname Scan.txt"));
+            //$ startGUI(); //default GUI interface
+            Loader.loadDataset(new File("C:\\pia test data\\2018.06.22 155701 testname Scan.txt"));
         } else {
             startConsole(); //console interface
         }

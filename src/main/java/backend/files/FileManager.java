@@ -49,7 +49,7 @@ public class FileManager {
 
     public static void addLineToFile(FileWriter writer, String line) throws IOException
     {
-        writer.write(line + "\n");
+        writer.write(line + "\r\n");
     }
 
     public static void addPointToFile(FileWriter writer, Point point) throws IOException

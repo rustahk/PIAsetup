@@ -7,7 +7,6 @@ import backend.files.FileManager;
 import backend.files.HotSave;
 import backend.files.StandartSave;
 import gui.MainMenu;
-import gui.ScanMenu;
 import jssc.SerialPortException;
 
 import java.io.IOException;
@@ -39,7 +38,7 @@ public class LogicCommands
 
                     points[i] = scanPoint(start.getWavelenght() + (scanstep * i * direction), delay);
                     for (PointRecipient r : listeners) r.newPoint(points[i]);
-                    ScanMenu.updateStatus(i, numpoints);
+                    MainMenu.updateStatus(i, numpoints);
                     if (Thread.interrupted()) throw new InterruptedException();
             }
         }
@@ -73,10 +72,6 @@ public class LogicCommands
             return false;
         }
         return true;
-    }
-    public static void startControl()
-    {
-
     }
 
     public static boolean saveScan(Dataset dataset)

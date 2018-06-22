@@ -25,8 +25,11 @@ public class ConnectionMenu {
     private TextField delay_field;
     private Stage connectionWindow;
 
+    public ConnectionMenu(Stage primaryStage) {
+        createWindow(primaryStage);
+    }
 
-    public void createWindow(Stage primaryStage) {
+    private void createWindow(Stage primaryStage) {
         //Elements
         device = new MenuButton("Engine");
         port = new MenuButton("Port");

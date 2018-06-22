@@ -29,7 +29,7 @@ public class TerminalMenu implements SystemRecipient, ErrorRecipient, PointRecip
         terminalWindow.initOwner(mainMenu);
         terminalWindow.setTitle("Terminal");
         textArea = new TextArea();
-        Scene secondScene = new Scene(textArea, 700, 256);
+        Scene secondScene = new Scene(textArea, 900, 450);
         terminalWindow.setScene(secondScene);
     }
 

@@ -39,6 +39,7 @@ public class MainMenu extends Application implements PointRecipient {
     private static TerminalMenu terminalMenu;
     private static ConnectionMenu connectionMenu;
     private static Stage mainStage;
+    private static CalcMenu calcMenu;
     private Scene scene;
     //Center plot
     private ScatterChart.Series<Number, Number> X_series;
@@ -61,7 +62,6 @@ public class MainMenu extends Application implements PointRecipient {
     public void start(Stage primaryStage) throws Exception {
         mainStage = primaryStage;
         terminalMenu = new TerminalMenu(primaryStage);
-        connectionMenu = new ConnectionMenu(primaryStage);
         try {
             Initializer.fullInit();
             loadMenu(primaryStage);
@@ -74,7 +74,7 @@ public class MainMenu extends Application implements PointRecipient {
             errorMessage("Initialization", "Critical error", "Application will be closed: " + e.toString(), e);
             closeProgram();
         }
-        //$loadMenu(primaryStage);
+        //$ loadMenu(primaryStage);
     }
 
     private void loadMenu(Stage primaryStage) {
@@ -105,10 +105,12 @@ public class MainMenu extends Application implements PointRecipient {
                 } catch (NullPointerException e) {
                     //Nothing, it means that task doesn't exist
                 }
+                Initializer.fullClose();
+                closeMessage();
             }
         });
         primaryStage.show();
-        CalibrationMenu.openDialog();
+        CalibrationMenu.openDialog(); //$
     }
 
     private BorderPane loadRoot() {
@@ -145,12 +147,20 @@ public class MainMenu extends Application implements PointRecipient {
         connection.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
+                if(connectionMenu == null) connectionMenu = new ConnectionMenu(mainStage);
                 connectionMenu.openWindow();
+            }
+        });
+        calc.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                if(calcMenu == null) calcMenu = new CalcMenu(mainStage);
+                calcMenu.openWindow();
             }
         });
         //DEVELOPING
         connection.setDisable(true);
-        calc.setDisable(true);
+        calc.setDisable(false);
     }
 
     private void loadRight(BorderPane root) {
@@ -245,9 +255,10 @@ public class MainMenu extends Application implements PointRecipient {
         } catch (NullPointerException e) {
 
         }
+        closeMessage();
     }
 
-    public void close() {
+    public static void closeMessage() {
         ServiceProcessor.serviceMessage(FileManager.getDateTimeStamp(new Date()) + " #Session finish");
     }
 

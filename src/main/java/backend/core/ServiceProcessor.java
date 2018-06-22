@@ -13,7 +13,7 @@ public class ServiceProcessor {
         listeners.add(toAdd);
     }
 
-    public static void serviceMessage(String msg)
+    public static synchronized void serviceMessage(String msg)
     {
         msg="[SYSTEM]: " + msg;
         //Logger.addtoLog(msg);

@@ -5,7 +5,7 @@ import backend.data.Point;
 import backend.devices.*;
 import backend.files.FileManager;
 import backend.files.HotSave;
-import backend.files.StandartSave;
+import backend.files.Saver;
 import gui.MainMenu;
 import jssc.SerialPortException;
 
@@ -76,7 +76,7 @@ public class LogicCommands
 
     public static boolean saveScan(Dataset dataset)
     {
-       return StandartSave.saveDataset(dataset);
+       return Saver.saveDataset(dataset);
     }
 
     private static Point scanPoint(double wavelenght, int delay) throws IOException, SerialPortException, InterruptedException

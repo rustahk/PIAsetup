@@ -9,7 +9,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-public class StandartSave {
+public class Saver {
 
     public static boolean saveDataset(Dataset dataset) {
         File scanfile;
@@ -33,13 +33,13 @@ public class StandartSave {
 
     private static String scanHead(Dataset dataset) {
         String header =
-                "%SAMPLE: " + dataset.getSample_name() + "\r\n" +
-                        "%START: " + FileManager.getDateTimeStamp(dataset.getStarttime()) + "\r\n" +
-                        "%FINISH: " + FileManager.getDateTimeStamp(dataset.getFinishtime()) + "\r\n" +
-                        "%DELAY: " + dataset.getDelay() + "\r\n" +
-                        "%STEP: " + dataset.getStep() + "\r\n" +
-                        "%TOTAL NUMBER OF POINTS: " + dataset.getPoints().length + "\r\n" +
-                        "%nm, singal_x, signal_y" + "\r\n";
+                "%SAMPLE: " + dataset.getSample_name() + "\n" +
+                        "%START: " + FileManager.getDateTimeStamp(dataset.getStarttime()) + "\n" +
+                        "%FINISH: " + FileManager.getDateTimeStamp(dataset.getFinishtime()) + "\n" +
+                        "%DELAY: " + dataset.getDelay() + "\n" +
+                        "%STEP: " + dataset.getStep() + "\n" +
+                        "%TOTAL NUMBER OF POINTS: " + dataset.getPoints().length + "\n" +
+                        "%nm, singal_x, signal_y" + "\n";
         return header;
     }
 

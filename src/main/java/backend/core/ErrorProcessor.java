@@ -14,7 +14,7 @@ public class ErrorProcessor {
         listeners.add(toAdd);
     }
 
-    public static void standartError(String comment, Exception e)
+    public static synchronized void standartError(String comment, Exception e)
     {
         comment="[ERROR]: "+comment;
         //Logger.addtoLog(comment + " " + e.toString());

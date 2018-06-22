@@ -74,7 +74,7 @@ public class MainMenu extends Application implements PointRecipient {
             errorMessage("Initialization", "Critical error", "Application will be closed: " + e.toString(), e);
             closeProgram();
         }
-        loadMenu(primaryStage); //$
+        //$loadMenu(primaryStage);
     }
 
     private void loadMenu(Stage primaryStage) {
@@ -108,6 +108,7 @@ public class MainMenu extends Application implements PointRecipient {
             }
         });
         primaryStage.show();
+        CalibrationMenu.openDialog();
     }
 
     private BorderPane loadRoot() {

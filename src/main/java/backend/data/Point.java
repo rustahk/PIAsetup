@@ -42,4 +42,10 @@ public class Point
         this.wavelenght = wavelenght;
         //this.setValue(null, null);
     }
+
+    public Point(double wavelenght, String valueX, String valueY) {
+        this.wavelenght = wavelenght;
+        this.valueX = valueX;
+        this.valueY = valueY;
+    }
 }

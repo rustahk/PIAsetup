@@ -49,4 +49,13 @@ public class Dataset {
     public String getSample_name() {
         return sample_name;
     }
+
+    public Dataset(Point[] points, Date starttime, Date finishtime, int delay, double step, String sample_name) {
+        this.points = points;
+        this.starttime = starttime;
+        this.finishtime = finishtime;
+        this.delay = delay;
+        this.step = step;
+        this.sample_name = sample_name;
+    }
 }

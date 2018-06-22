@@ -1,13 +1,8 @@
 import backend.core.ErrorProcessor;
 import backend.core.Initializer;
-import backend.files.Loader;
 import console.*;
 import gui.MainMenu;
-import gui.NewMenu;
 import javafx.application.Application;
-import jssc.SerialPortException;
-
-import java.io.File;
 
 public class Main {
 
@@ -16,7 +11,6 @@ public class Main {
 
         if (args.length == 0) {
             startGUI(); //default GUI interface
-            //$ Loader.loadDataset(new File("C:\\pia test data\\2018.06.22 155701 testname Scan.txt"));
         } else {
             startConsole(); //console interface
         }

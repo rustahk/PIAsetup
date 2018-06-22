@@ -14,12 +14,14 @@ public class FileManager {
     public final static File mainfile;
     public final static SimpleDateFormat time_format;
     public final static SimpleDateFormat date_format;
+    public final static SimpleDateFormat data_time_format;
 
     static
     {
         mainfile = new File(maindir);
         time_format = new SimpleDateFormat("HH:mm:ss");
         date_format = new SimpleDateFormat("yyyy.MM.dd");
+        data_time_format = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
     }
 
     public static void init() throws IOException

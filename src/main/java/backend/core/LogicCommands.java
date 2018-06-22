@@ -1,6 +1,7 @@
 package backend.core;
 
 import backend.data.Dataset;
+import backend.data.DatasetsDifferent;
 import backend.data.Point;
 import backend.devices.*;
 import backend.files.FileManager;
@@ -114,5 +115,19 @@ public class LogicCommands
         {
             MainMenu.errorMessage("Engine", "Fail to move", e.toString(), e);
         }
+    }
+    public static Dataset normalizeData(Dataset data, Dataset reference) throws DatasetsDifferent //value_data/value_ref
+    {
+        if(data.getPoints().length!=reference.getPoints().length) throw new DatasetsDifferent("Different number of points");
+        if(data.getPoints()[0].getWavelenght()!=reference.getPoints()[0].getWavelenght()) throw new DatasetsDifferent("Different start wavelenght");
+        if(data.getPoints()[data.getPoints().length-1].getWavelenght()!=reference.getPoints()[reference.getPoints().length-1].getWavelenght()) throw new DatasetsDifferent("Different finish wavelenght");
+        Point[] normalized = new Point[data.getPoints().length];
+        for(int i = 0; i<data.getPoints().length; i++)
+        {
+            double x = Double.parseDouble(data.getPoints()[i].getValueX())/Double.parseDouble(reference.getPoints()[i].getValueX());
+            double y=  Double.parseDouble(data.getPoints()[i].getValueY())/Double.parseDouble(reference.getPoints()[i].getValueY());
+            normalized[i] = new Point(data.getPoints()[i].getWavelenght(), ""+x,""+y);
+        }
+        return new Dataset(normalized, data.getStarttime(), data.getFinishtime(), data.getDelay(), data.getStep(), data.getSample_name()+" [NORMALIZED]");
     }
 }

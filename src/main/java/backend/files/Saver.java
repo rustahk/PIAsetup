@@ -8,6 +8,7 @@ import backend.data.Point;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.LinkedList;
 
 public class Saver {
 
@@ -17,7 +18,7 @@ public class Saver {
             scanfile = new File(FileManager.mainfile.getAbsolutePath(), FileManager.convertToFileName(FileManager.getDateTimeStamp(dataset.getStarttime())) +" " + dataset.getSample_name() +" Scan.txt");
             scanfile.createNewFile();
             FileWriter scanwriter = new FileWriter(scanfile, false);
-            scanwriter.write(scanHead(dataset));
+            scanHead(dataset, scanwriter);
             for (Point i : dataset.getPoints()) {
                 FileManager.addPointToFile(scanwriter, i);
             }
@@ -31,16 +32,16 @@ public class Saver {
         return true;
     }
 
-    private static String scanHead(Dataset dataset) {
-        String header =
-                "%SAMPLE: " + dataset.getSample_name() + "\n" +
-                        "%START: " + FileManager.getDateTimeStamp(dataset.getStarttime()) + "\n" +
-                        "%FINISH: " + FileManager.getDateTimeStamp(dataset.getFinishtime()) + "\n" +
-                        "%DELAY: " + dataset.getDelay() + "\n" +
-                        "%STEP: " + dataset.getStep() + "\n" +
-                        "%TOTAL NUMBER OF POINTS: " + dataset.getPoints().length + "\n" +
-                        "%nm, singal_x, signal_y" + "\n";
-        return header;
+    private static void scanHead(Dataset dataset, FileWriter writer) throws IOException{
+        LinkedList<String> header = new LinkedList<String>();
+        header.add("%SAMPLE: " + dataset.getSample_name());
+        header.add("%START: " + FileManager.data_time_format.format(dataset.getStarttime()));
+        header.add("%FINISH: " + FileManager.data_time_format.format(dataset.getFinishtime()));
+        header.add("%DELAY: " + dataset.getDelay());
+        header.add("%STEP: " + dataset.getStep());
+        header.add("%TOTAL_NUMBER_OF_POINTS: " + dataset.getPoints().length);
+        header.add("%nm, singal_x, signal_y");
+        for(String i : header) FileManager.addLineToFile(writer, i);
     }
 
 }

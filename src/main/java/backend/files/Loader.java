@@ -40,7 +40,7 @@ public class Loader { //It's rape of a RAM :(
         int j=0;
         lines = readFile(scanfile);
         for (String i : lines) {
-            if(i.charAt(0)=='%')
+            if(i.equals("") || i.charAt(0)=='%')
             {
                 //ignore
             }

@@ -75,6 +75,7 @@ public class MainMenu extends Application implements PointRecipient {
             closeProgram();
         }
         //$ loadMenu(primaryStage);
+        new CalcMenu(primaryStage).openWindow();
     }
 
     private void loadMenu(Stage primaryStage) {
@@ -160,7 +161,6 @@ public class MainMenu extends Application implements PointRecipient {
         });
         //DEVELOPING
         connection.setDisable(true);
-        calc.setDisable(false);
     }
 
     private void loadRight(BorderPane root) {

@@ -132,6 +132,7 @@ public class CalcMenu {
             @Override
             public void handle(ActionEvent event) {
                 Saver.saveDataset(normalized);
+                MainMenu.infoMessage("File saved", "New dataset saved", normalized.getSample_name());
             }
         });
     }

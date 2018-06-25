@@ -75,7 +75,7 @@ public class MainMenu extends Application implements PointRecipient {
             closeProgram();
         }
         //$ loadMenu(primaryStage);
-        new CalcMenu(primaryStage).openWindow();
+        //new CalcMenu(primaryStage).openWindow();
     }
 
     private void loadMenu(Stage primaryStage) {
@@ -280,6 +280,17 @@ public class MainMenu extends Application implements PointRecipient {
         warining.setContentText(content_text);
         warining.showAndWait();
     }
+
+    public static void infoMessage(String info_title, String info_msg, String content_text)
+    {
+        ServiceProcessor.serviceMessage(info_msg);
+        Alert info = new Alert(Alert.AlertType.INFORMATION);
+        info.setTitle(info_title);
+        info.setHeaderText(info_msg);
+        info.setContentText(content_text);
+        info.showAndWait();
+    }
+
 
     private void startScan() {
         //**Get user data from the fields

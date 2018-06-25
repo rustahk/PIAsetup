@@ -63,19 +63,19 @@ public class MainMenu extends Application implements PointRecipient {
         mainStage = primaryStage;
         terminalMenu = new TerminalMenu(primaryStage);
         try {
+            terminalMenu.openWindow();
             Initializer.fullInit();
             loadMenu(primaryStage);
+
         } catch (SerialPortException e) {
-            terminalMenu.openWindow();
+
             errorMessage("Initialization", "Connection fail", "Application will be closed: " + e.toString(), null);
             closeProgram();
         } catch (Exception e) {
-            terminalMenu.openWindow();
             errorMessage("Initialization", "Critical error", "Application will be closed: " + e.toString(), e);
             closeProgram();
         }
         //$ loadMenu(primaryStage);
-        //new CalcMenu(primaryStage).openWindow();
     }
 
     private void loadMenu(Stage primaryStage) {
@@ -99,6 +99,8 @@ public class MainMenu extends Application implements PointRecipient {
                         Optional<ButtonType> option = confirm_exit.showAndWait();
                         if (option.get() == ButtonType.OK) {
                             scan_task.cancel(true);
+                            Initializer.fullClose();
+                            closeMessage();
                         } else {
                             event.consume();
                         }
@@ -106,8 +108,6 @@ public class MainMenu extends Application implements PointRecipient {
                 } catch (NullPointerException e) {
                     //Nothing, it means that task doesn't exist
                 }
-                Initializer.fullClose();
-                closeMessage();
             }
         });
         primaryStage.show();

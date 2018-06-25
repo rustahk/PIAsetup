@@ -72,10 +72,10 @@ public class MainMenu extends Application implements PointRecipient {
 
         } catch (SerialPortException e) {
 
-            errorMessage("Initialization", "Connection fail", "Application will be closed: " + e.toString(), null);
+            errorMessage("System start: FAIL", "Setup connection fail", "Application will be closed: " + e.toString(), null);
             closeProgram();
         } catch (Exception e) {
-            errorMessage("Initialization", "Critical error", "Application will be closed: " + e.toString(), e);
+            errorMessage("System start: FAIL", "Critical error", "Application will be closed: " + e.toString(), e);
             closeProgram();
         }
     }
@@ -101,7 +101,6 @@ public class MainMenu extends Application implements PointRecipient {
                         Optional<ButtonType> option = confirm_exit.showAndWait();
                         if (option.get() == ButtonType.OK) {
                             scan_task.cancel(true);
-                            closeMessage();
                         } else {
                             event.consume();
                         }
@@ -252,11 +251,6 @@ public class MainMenu extends Application implements PointRecipient {
         } catch (NullPointerException e) {
 
         }
-        closeMessage();
-    }
-
-    public static void closeMessage() {
-        ServiceProcessor.serviceMessage(FileManager.getDateTimeStamp(new Date()) + " #Session finish");
     }
 
     public static void errorMessage(String error_title, String error_msg, String content_text, Exception e) {

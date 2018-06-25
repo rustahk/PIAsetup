@@ -11,6 +11,8 @@ import gui.ConnectionMenu;
 import gui.MainMenu;
 import jssc.SerialPortException;
 
+import java.util.Date;
+
 public class Initializer {
     private static Connection engine_connection;
     private static Connection lockin_connection;
@@ -25,6 +27,7 @@ public class Initializer {
 
     public static void fullClose() {
         Connection.cleanPorts();
+        ServiceProcessor.serviceMessage(FileManager.getDateTimeStamp(new Date()) + " #Session finish");
     }
 
     public static void initLogger() throws Exception {

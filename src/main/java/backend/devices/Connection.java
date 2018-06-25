@@ -243,6 +243,14 @@ public class Connection {
         {
             if(i!=null)
             {
+                try
+                {
+                    i.removeEventListener();;
+                }
+                catch (SerialPortException e)
+                {
+                    ErrorProcessor.standartError("Fail to remove port listener", e);
+                }
                 if(i.isOpened())
                 {
                     try {
@@ -252,13 +260,6 @@ public class Connection {
                     {
                         ErrorProcessor.standartError("Fail to close port", e);
                     }
-                }
-                try {
-                    i.removeEventListener();;
-                }
-                catch (SerialPortException e)
-                {
-                    ErrorProcessor.standartError("Fail to remove port listener", e);
                 }
             }
         }

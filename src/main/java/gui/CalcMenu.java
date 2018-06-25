@@ -55,10 +55,10 @@ public class CalcMenu {
         NumberAxis yAxis = new NumberAxis();
         yAxis.setForceZeroInRange(false);
         xAxis.setLabel("Wavelenght, nm");
-        yAxis.setLabel("Signal, V");
+        yAxis.setLabel("Absorbtion, a.u.");
         //**Scatter**
         ScatterChart<Number, Number> sc = new ScatterChart<Number, Number>(xAxis, yAxis);
-        sc.setTitle("Absorbtion signal");
+        sc.setTitle("Absorbtion spectra");
         //**Series**
         X_series = new ScatterChart.Series<Number, Number>();
         Y_series = new ScatterChart.Series<Number, Number>();
@@ -117,8 +117,8 @@ public class CalcMenu {
                     normalized = LogicCommands.normalizeData(scan, ref);
                     clearPlot();
                     for (Point i : normalized.getPoints()) {
-                        X_series.getData().add(new XYChart.Data(i.getWavelenght(), Double.parseDouble(i.getValueX())));
-                        Y_series.getData().add(new XYChart.Data(i.getWavelenght(), Double.parseDouble(i.getValueY())));
+                        X_series.getData().add(new XYChart.Data(i.getWavelenght(), i.getValueX()));
+                        Y_series.getData().add(new XYChart.Data(i.getWavelenght(), i.getValueY()));
                     }
                     save.setDisable(false);
                 } catch (Exception e) {

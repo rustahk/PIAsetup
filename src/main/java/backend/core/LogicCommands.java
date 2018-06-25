@@ -91,8 +91,15 @@ public class LogicCommands
         {
             throw new IOException("no value from lockin");
         }
-        String[] xy = value.split(",");
-        point.setValue(xy[0],xy[1]);
+        try {
+            String[] xy = value.split(",");
+            point.setValue(Double.parseDouble(xy[0]), Double.parseDouble(xy[1]));
+        }
+        catch (NumberFormatException e)
+        {
+            ErrorProcessor.standartError("Wrong value from lockin", e);
+            throw new IOException(e.getMessage() + " parse error");
+        }
         //point.setValue(Math.sin(wavelenght/10)*5+""); //$RANDOM_VALUES FOR TESTING
         return point;
     }
@@ -124,9 +131,9 @@ public class LogicCommands
         Point[] normalized = new Point[data.getPoints().length];
         for(int i = 0; i<data.getPoints().length; i++)
         {
-            double x = Double.parseDouble(data.getPoints()[i].getValueX())/Double.parseDouble(reference.getPoints()[i].getValueX());
-            double y=  Double.parseDouble(data.getPoints()[i].getValueY())/Double.parseDouble(reference.getPoints()[i].getValueY());
-            normalized[i] = new Point(data.getPoints()[i].getWavelenght(), ""+x,""+y);
+            double x = (data.getPoints()[i].getValueX())/(reference.getPoints()[i].getValueX());
+            double y=  (data.getPoints()[i].getValueY())/(reference.getPoints()[i].getValueY());
+            normalized[i] = new Point(data.getPoints()[i].getWavelenght(), x,y);
         }
         return new Dataset(normalized, data.getStarttime(), data.getFinishtime(), data.getDelay(), data.getStep(), data.getSample_name()+" [NORMALIZED]");
     }

@@ -7,6 +7,8 @@ import backend.devices.LockinStringCommands;
 import backend.files.Configurator;
 import backend.files.FileManager;
 import backend.files.Logger;
+import gui.ConnectionMenu;
+import gui.MainMenu;
 import jssc.SerialPortException;
 
 public class Initializer {
@@ -22,22 +24,7 @@ public class Initializer {
     }
 
     public static void fullClose() {
-
-        if(engine_connection!=null){
-            try {
-                engine_connection.disconnect();
-            } catch (Exception e) {
-                ErrorProcessor.standartError(engine_connection.getPortname() + " not closed", e);
-            }
-        }
-        if(lockin_connection!=null){
-            try {
-                lockin_connection.disconnect();
-            } catch (Exception e) {
-                ErrorProcessor.standartError(lockin_connection.getPortname() + " not closed", e);
-            }
-        }
-
+        Connection.cleanPorts();
     }
 
     public static void initLogger() throws Exception {
@@ -69,7 +56,10 @@ public class Initializer {
             engine_connection.connect();
         } catch (Exception e) {
             ErrorProcessor.standartError("Engine: FAIL", e);
-            throw e;
+            MainMenu.errorMessage("Connection", "Engine connection failed. Try to connect manually", e.toString(), e);
+            if (MainMenu.getConnectionMenu().restartEngineConnection()) {
+                //Nothing
+            } else throw e;
         }
         ServiceProcessor.serviceMessage("Engine: OK");
     }
@@ -82,8 +72,11 @@ public class Initializer {
             lockin_connection.connect();
             Lockin.sendCommand(LockinStringCommands.setOutInterface());
         } catch (Exception e) {
+            MainMenu.errorMessage("Connection", "Lockin connection failed. Try to connect manually", e.toString(), e);
             ErrorProcessor.standartError("Lockin: FAIL", e);
-            throw e;
+            if (MainMenu.getConnectionMenu().restartLockinConnection()) {
+                //Nothing
+            } else throw e;
         }
         ServiceProcessor.serviceMessage("Lockin: OK");
     }

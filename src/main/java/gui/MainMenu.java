@@ -29,6 +29,8 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import jssc.SerialPortException;
+import sun.applet.Main;
+
 import java.io.IOException;
 import java.util.Date;
 import java.util.Optional;
@@ -62,6 +64,7 @@ public class MainMenu extends Application implements PointRecipient {
     public void start(Stage primaryStage) throws Exception {
         mainStage = primaryStage;
         terminalMenu = new TerminalMenu(primaryStage);
+        connectionMenu = new ConnectionMenu(primaryStage);
         try {
             terminalMenu.openWindow();
             Initializer.fullInit();
@@ -75,7 +78,6 @@ public class MainMenu extends Application implements PointRecipient {
             errorMessage("Initialization", "Critical error", "Application will be closed: " + e.toString(), e);
             closeProgram();
         }
-        //$ loadMenu(primaryStage);
     }
 
     private void loadMenu(Stage primaryStage) {
@@ -99,7 +101,6 @@ public class MainMenu extends Application implements PointRecipient {
                         Optional<ButtonType> option = confirm_exit.showAndWait();
                         if (option.get() == ButtonType.OK) {
                             scan_task.cancel(true);
-                            Initializer.fullClose();
                             closeMessage();
                         } else {
                             event.consume();
@@ -111,7 +112,7 @@ public class MainMenu extends Application implements PointRecipient {
             }
         });
         primaryStage.show();
-        CalibrationMenu.openDialog(); //$
+        CalibrationMenu.openDialog();
     }
 
     private BorderPane loadRoot() {
@@ -148,19 +149,16 @@ public class MainMenu extends Application implements PointRecipient {
         connection.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                if(connectionMenu == null) connectionMenu = new ConnectionMenu(mainStage);
                 connectionMenu.openWindow();
             }
         });
         calc.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                if(calcMenu == null) calcMenu = new CalcMenu(mainStage);
+                if (calcMenu == null) calcMenu = new CalcMenu(mainStage);
                 calcMenu.openWindow();
             }
         });
-        //DEVELOPING
-        connection.setDisable(true);
     }
 
     private void loadRight(BorderPane root) {
@@ -245,7 +243,6 @@ public class MainMenu extends Application implements PointRecipient {
     }
 
     public static void closeProgram() {
-        Initializer.fullClose();
         try {
             terminalMenu.closeWindow();
         } catch (NullPointerException e) {
@@ -281,8 +278,7 @@ public class MainMenu extends Application implements PointRecipient {
         warining.showAndWait();
     }
 
-    public static void infoMessage(String info_title, String info_msg, String content_text)
-    {
+    public static void infoMessage(String info_title, String info_msg, String content_text) {
         ServiceProcessor.serviceMessage(info_msg);
         Alert info = new Alert(Alert.AlertType.INFORMATION);
         info.setTitle(info_title);
@@ -290,7 +286,6 @@ public class MainMenu extends Application implements PointRecipient {
         info.setContentText(content_text);
         info.showAndWait();
     }
-
 
     private void startScan() {
         //**Get user data from the fields
@@ -337,7 +332,7 @@ public class MainMenu extends Application implements PointRecipient {
         scan_task.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, new EventHandler<WorkerStateEvent>() {
             @Override
             public void handle(WorkerStateEvent event) {
-                ServiceProcessor.serviceMessage("Scan finished");
+                MainMenu.infoMessage("Scan", "Scan finished", "File saved");
                 scanEnd();
                 if (autoreturn) LogicCommands.moveTo(new Point(start_wavelenght));
             }
@@ -405,8 +400,8 @@ public class MainMenu extends Application implements PointRecipient {
     public boolean newPoint(Point e) {
         Platform.runLater(new Runnable() {
             public void run() {
-                X_series.getData().add(new ScatterChart.Data<Number, Number>(e.getWavelenght(), Double.parseDouble(e.getValueX())));
-                Y_series.getData().add(new ScatterChart.Data<Number, Number>(e.getWavelenght(), Double.parseDouble(e.getValueY())));
+                    X_series.getData().add(new ScatterChart.Data<Number, Number>(e.getWavelenght(), e.getValueX()));
+                    Y_series.getData().add(new ScatterChart.Data<Number, Number>(e.getWavelenght(), e.getValueY()));
             }
         });
         return true;
@@ -453,4 +448,9 @@ public class MainMenu extends Application implements PointRecipient {
         X_series.getData().clear();
         Y_series.getData().clear();
     }
+
+    public static ConnectionMenu getConnectionMenu() {
+        return connectionMenu;
+    }
 }
+

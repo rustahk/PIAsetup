@@ -2,10 +2,7 @@ package backend.devices;
 
 import backend.core.ErrorProcessor;
 import backend.core.ServiceProcessor;
-import jssc.SerialPort;
-import jssc.SerialPortEvent;
-import jssc.SerialPortEventListener;
-import jssc.SerialPortException;
+import jssc.*;
 
 import java.io.*;
 import java.util.LinkedList;
@@ -22,17 +19,17 @@ public class Connection {
     private int stopbits;
     private int parity;
     //****
-    private boolean status;
     private SerialPort port;
     private PortReader portreader;
     private boolean responceString;
     private int messagesize;
 
+    private static LinkedList<SerialPort> opened_ports = new LinkedList<SerialPort>();
+
     private int responcedelay; //COM port and devices are not infinity fast. This parameter give
 
 
     public Connection(String portname, int baudrate, int databits, int stopbits, int parity, int messagesize, boolean responceString, int responcedelay) {
-        status = false;
         this.portname = portname;
         this.baudrate = baudrate;
         this.databits = databits;
@@ -41,7 +38,6 @@ public class Connection {
         this.messagesize = messagesize;
         this.responceString = responceString;
         this.responcedelay = responcedelay;
-
     }
 
     public void connect() throws SerialPortException {
@@ -50,12 +46,10 @@ public class Connection {
         port.openPort();
         port.setParams(baudrate, databits, stopbits, parity);
         port.setFlowControlMode(SerialPort.FLOWCONTROL_RTSCTS_IN | SerialPort.FLOWCONTROL_RTSCTS_OUT);
-
         if (responceString) portreader = new StringPortReader();
         else portreader = new BytePortReader();
-
         port.addEventListener(portreader, SerialPort.MASK_RXCHAR);
-        status = true;
+        addNewPort(port);
         ServiceProcessor.serviceMessage(portname + " connection: OK");
     }
 
@@ -100,9 +94,8 @@ public class Connection {
     }
 
     public void disconnect() throws SerialPortException {
-        if (status) {
+        if (isOpened()) {
             port.closePort();
-            status = false;
             ServiceProcessor.serviceMessage(portname + " disconnected");
         }
     }
@@ -227,6 +220,48 @@ public class Connection {
         public abstract void serialEvent(SerialPortEvent event);
         public abstract void cleanInput();
 
+    }
+
+    public static String[] getPortNames()
+    {
+        return SerialPortList.getPortNames();
+    }
+
+    public boolean isOpened()
+    {
+        return port.isOpened();
+    }
+
+    private static void addNewPort(SerialPort p)
+    {
+        opened_ports.add(p);
+    }
+
+    public static void cleanPorts()
+    {
+        for(SerialPort i : opened_ports)
+        {
+            if(i!=null)
+            {
+                if(i.isOpened())
+                {
+                    try {
+                        i.closePort();
+                    }
+                    catch (SerialPortException e)
+                    {
+                        ErrorProcessor.standartError("Fail to close port", e);
+                    }
+                }
+                try {
+                    i.removeEventListener();;
+                }
+                catch (SerialPortException e)
+                {
+                    ErrorProcessor.standartError("Fail to remove port listener", e);
+                }
+            }
+        }
     }
 }
 

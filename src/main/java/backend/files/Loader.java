@@ -48,7 +48,7 @@ public class Loader { //It's rape of a RAM :(
             {
                 String[] k = i.split("\t");
                 if(k.length!=3) throw new IOException("Bad point");
-                points[j] = new Point(Double.parseDouble(k[0]), k[1], k[2]);
+                points[j] = new Point(Double.parseDouble(k[0]), Double.parseDouble(k[0]), Double.parseDouble(k[0]));
                 j++;
             }
         }

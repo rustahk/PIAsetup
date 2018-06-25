@@ -1,5 +1,10 @@
 package gui;
 
+import backend.core.ServiceProcessor;
+import backend.devices.Connection;
+import backend.devices.Engine;
+import backend.devices.Lockin;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -13,6 +18,10 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import jssc.SerialPort;
+import jssc.SerialPortException;
+
+import java.io.IOException;
 
 
 public class ConnectionMenu {
@@ -24,6 +33,10 @@ public class ConnectionMenu {
     private MenuButton parity;
     private TextField delay_field;
     private Stage connectionWindow;
+    private final String engine_name = "Engine";
+    private final String lockin_name = "Lockin";
+    private final String[] parities = new String[5];
+    private boolean critical;
 
     public ConnectionMenu(Stage primaryStage) {
         createWindow(primaryStage);
@@ -31,7 +44,7 @@ public class ConnectionMenu {
 
     private void createWindow(Stage primaryStage) {
         //Elements
-        device = new MenuButton("Engine");
+        device = new MenuButton("Device");
         port = new MenuButton("Port");
         baud_rate = new MenuButton("Baud rate");
         data_bits = new MenuButton("Data bits");
@@ -42,20 +55,20 @@ public class ConnectionMenu {
         //Menu items & actions
         //Devices
         //Engine:
-        MenuItem engine = new MenuItem("Engine");
+        MenuItem engine = new MenuItem(engine_name);
         engine.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                device.setText("Engine");
+                device.setText(engine_name);
             }
         });
         device.getItems().addAll(engine);
         //Lockin:
-        MenuItem lockin = new MenuItem("Lockin");
+        MenuItem lockin = new MenuItem(lockin_name);
         lockin.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                device.setText("Lockin");
+                device.setText(lockin_name);
             }
         });
         device.getItems().addAll(lockin);
@@ -71,6 +84,8 @@ public class ConnectionMenu {
             });
             baud_rate.getItems().addAll(item);
         }
+        //Port
+        //**Updated whe window opens**
         //Data_bits
         for (int i = 5; i <= 8; i++) {
             final int value = i;
@@ -96,14 +111,12 @@ public class ConnectionMenu {
             stopbits.getItems().addAll(item);
         }
         //Parity
-        String[] parities = new String[5];
-        parities[0]="NONE";
-        parities[1]="ODD";
-        parities[2]="EVEN";
-        parities[3]="MARK";
-        parities[4]="SPACE";
-        for (String line : parities)
-        {
+        parities[0] = "NONE";
+        parities[1] = "ODD";
+        parities[2] = "EVEN";
+        parities[3] = "MARK";
+        parities[4] = "SPACE";
+        for (String line : parities) {
             MenuItem item = new MenuItem(line);
             item.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
@@ -113,6 +126,13 @@ public class ConnectionMenu {
             });
             parity.getItems().addAll(item);
         }
+        //Button
+        connect_button.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                connectTo();
+            }
+        });
         //Elements position
         HBox hbox = new HBox();
         hbox.setSpacing(10);
@@ -130,16 +150,149 @@ public class ConnectionMenu {
     }
 
     public void openWindow() {
+        updatePortList();
         connectionWindow.show();
     }
 
-    private class DeviceParamenters {
-        private String device;
-        private String port;
-        private int baud_rate;
-        private int data_bits;
-        private int stopbits;
-        private int parity;
-        private int delay_field;
+    private void updatePortList() {
+        port.getItems().clear();
+        for (String i : Connection.getPortNames()) {
+            MenuItem item = new MenuItem(i);
+            item.setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent event) {
+                    port.setText(i);
+                }
+            });
+            port.getItems().addAll(item);
+        }
+    }
+
+    private boolean connectTo() {
+
+        try {
+            if (device.getText().equals(engine_name)) {
+                ServiceProcessor.serviceMessage("Try to reconnect " + device.getText().equals(engine_name));
+                Connection engine = createConnection(9, false);
+                if (Engine.getConnection() != null && Engine.getConnection().isOpened())
+                    Engine.getConnection().disconnect();
+                Engine.init(engine);
+                engine.connect();
+            } else if (device.getText().equals(lockin_name)) {
+                ServiceProcessor.serviceMessage("Try to reconnect " + device.getText().equals(engine_name));
+                Connection lockin = createConnection(0, true);
+                if (Lockin.getConnection() != null && Lockin.getConnection().isOpened())
+                    Lockin.getConnection().disconnect();
+                Lockin.init(lockin);
+                lockin.connect();
+            } else {
+                throw new IOException("Device is not chosen");
+            }
+            MainMenu.infoMessage("Connection", "Reconnect to " + device.getText() + ": OK", port.getText());
+            if(critical)
+            {
+                critical = false;
+                connectionWindow.close();
+            }
+            return true;
+        } catch (IOException e) {
+            MainMenu.errorMessage("Wrong value", "You have to choose all parameters before connection", e.toString(), e);
+            return false;
+        } catch (SerialPortException e) {
+            MainMenu.errorMessage("Connection", device.getText() + "connection: FAIL", e.toString(), e);
+            return false;
+        }
+    }
+
+    private Connection createConnection(int message_size, boolean responce_type) throws IOException {
+        return new Connection(getPort(), getBaudRate(), getDataBits(), getStopBit(), getParity(), message_size, responce_type, getDelay());
+    }
+
+    private String getPort() throws IOException {
+        if (port.getText().equals("Port")) throw new IOException("Port is not chosen");
+        return port.getText();
+    }
+
+    private int getBaudRate() throws IOException {
+        try {
+            return Integer.parseInt(baud_rate.getText());
+        } catch (NumberFormatException e) {
+            throw new IOException("Baud rate is not chosen");
+        }
+    }
+
+    private int getDataBits() throws IOException {
+        try {
+            return Integer.parseInt(data_bits.getText());
+        } catch (NumberFormatException e) {
+            throw new IOException("Data bits are not chosen");
+        }
+    }
+
+    private int getStopBit() throws IOException {
+
+        switch (stopbits.getText()) {
+            case "1.0":
+                return SerialPort.STOPBITS_1;
+            case "1.5":
+                return SerialPort.STOPBITS_1_5;
+            case "2.0":
+                return SerialPort.STOPBITS_2;
+            default:
+                throw new IOException("Data bits are not chosen");
+        }
+    }
+
+    private int getParity() throws IOException {
+        switch (parity.getText()) {
+            case "NONE":
+                return SerialPort.PARITY_NONE;
+            case "EVEN":
+                return SerialPort.PARITY_EVEN;
+            case "MARK":
+                return SerialPort.PARITY_MARK;
+            case "SPACE":
+                return SerialPort.PARITY_SPACE;
+            case "ODD":
+                return SerialPort.PARITY_ODD;
+            default:
+                throw new IOException("Parity are not chosen");
+        }
+    }
+
+    private int getDelay() throws IOException {
+        try {
+            return Integer.parseInt(delay_field.getText());
+        } catch (NumberFormatException e) {
+            throw new IOException("Responce value is not INT");
+        }
+    }
+
+    public boolean restartEngineConnection()
+    {
+        device.setText(engine_name);
+        return restartDevice();
+    }
+
+    public boolean restartLockinConnection()
+    {
+        device.setText(lockin_name);
+        return restartDevice();
+    }
+    private boolean restartDevice()
+    {
+        critical = true;
+        device.setDisable(true);
+        updatePortList();
+        connectionWindow.showAndWait();
+        if(critical)
+        {
+            return !critical;
+        }
+        else
+        {
+            device.setDisable(false);
+            return true;
+        }
     }
 }

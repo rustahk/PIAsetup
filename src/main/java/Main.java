@@ -14,6 +14,7 @@ public class Main {
         } else {
             startConsole(); //console interface
         }
+        Initializer.fullClose();
     }
 
     private static void startGUI() {
@@ -28,9 +29,6 @@ public class Main {
             ConsoleProcessor.mainmenu(output);//Start console menu
         } catch (Exception ex_1) {
             ErrorProcessor.standartError("Start failed: ", ex_1);
-
-        } finally {
-            Initializer.fullClose();
         }
     }
 }

@@ -8,8 +8,8 @@ public class Point
     private int position;//position in steps
     private double wavelenght;//position in nm
     //measured values //Saved like string to avoid troubles with noise/wrong read from port
-    private String valueX;
-    private String valueY;
+    private double valueX;
+    private double valueY;
 
     public int getPosition() {
         return position;
@@ -19,16 +19,16 @@ public class Point
         return wavelenght;
     }
 
-    public String getValueX() {
+    public double getValueX() {
         return valueX;
     }
 
-    public void setValue(String x, String y) {
+    public void setValue(double x, double y) {
         this.valueX = x;
         this.valueY = y;
     }
 
-    public String getValueY() {
+    public double getValueY() {
         return valueY;
     }
 
@@ -43,7 +43,7 @@ public class Point
         //this.setValue(null, null);
     }
 
-    public Point(double wavelenght, String valueX, String valueY) {
+    public Point(double wavelenght, double valueX, double valueY) {
         this.wavelenght = wavelenght;
         this.valueX = valueX;
         this.valueY = valueY;

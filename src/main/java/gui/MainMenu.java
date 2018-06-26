@@ -334,7 +334,7 @@ public class MainMenu extends Application implements PointRecipient {
             wrongValue(e.getMessage(), null);
             return;
         }
-
+        position_monitor_task.cancel(true);
         scan_task = new Scanning(name, new Point(start_wavelenght), new Point(finish_wavelenght), points_number, delay);
         progressBar.progressProperty().unbind();
         progressBar.progressProperty().bind(scan_task.progressProperty());
@@ -373,6 +373,7 @@ public class MainMenu extends Application implements PointRecipient {
         progressBar.setDisable(true);
         stop_button.setDisable(true);
         start_button.setDisable(false);
+        new Thread(position_monitor_task).start();
     }
 
     private static int getIntValue(TextField field, String parameter_name) throws NumberFormatException {
@@ -414,6 +415,7 @@ public class MainMenu extends Application implements PointRecipient {
             public void run() {
                     X_series.getData().add(new ScatterChart.Data<Number, Number>(e.getWavelenght(), e.getValueX()));
                     Y_series.getData().add(new ScatterChart.Data<Number, Number>(e.getWavelenght(), e.getValueY()));
+                    showPosition(e.getWavelenght());
             }
         });
         return true;

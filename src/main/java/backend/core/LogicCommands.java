@@ -137,7 +137,7 @@ public class LogicCommands
             double y=  (data.getPoints()[i].getValueY())/(reference.getPoints()[i].getValueY());
             normalized[i] = new Point(data.getPoints()[i].getWavelenght(), x,y);
         }
-        return new Dataset(normalized, data.getStarttime(), data.getFinishtime(), data.getDelay(), data.getStep(), data.getSample_name()+" [NORMALIZED]");
+        return new Dataset(normalized, data.getStarttime(), data.getFinishtime(), data.getDelay(), data.getStep(), data.getSample_name()+" [CALC]");
     }
 
     public static synchronized double getCurrentPosition() throws SerialPortException, IOException, InterruptedException

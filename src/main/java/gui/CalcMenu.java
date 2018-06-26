@@ -55,10 +55,10 @@ public class CalcMenu {
         NumberAxis yAxis = new NumberAxis();
         yAxis.setForceZeroInRange(false);
         xAxis.setLabel("Wavelenght, nm");
-        yAxis.setLabel("Absorbtion, a.u.");
+        yAxis.setLabel("Transmission, a.u.");
         //**Scatter**
         ScatterChart<Number, Number> sc = new ScatterChart<Number, Number>(xAxis, yAxis);
-        sc.setTitle("Absorbtion spectra");
+        sc.setTitle("Transmission spectra");
         //**Series**
         X_series = new ScatterChart.Series<Number, Number>();
         Y_series = new ScatterChart.Series<Number, Number>();

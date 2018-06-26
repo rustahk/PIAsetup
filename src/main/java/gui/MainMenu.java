@@ -474,7 +474,7 @@ public class MainMenu extends Application implements PointRecipient {
     {
         Platform.runLater(new Runnable() {
             public void run() {
-                engine_position.setText("Position: "+ wavelenght + " nm");
+                engine_position.setText("Position: " + String.format("%8.2f", wavelenght) + " nm");
             }
         });
 
@@ -515,7 +515,7 @@ public class MainMenu extends Application implements PointRecipient {
             public void run() {
         final long time_s = time/1000;
         //finishtime.setText("Time to finish: " + (int) time_s/60 + "min " + (int) time%60 + "sec");
-        finishtime.setText("Point #" +npoint + " Time: " + time_s);
+        finishtime.setText("Point #" +npoint + " Time ~ " + time_s + "s");
             }
         });
     }

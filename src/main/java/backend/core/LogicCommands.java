@@ -23,6 +23,7 @@ public class LogicCommands
 
     public static Dataset startScan(String sample_name, Point start, Point finish, int numpoints, int delay) throws Exception
     {
+
         int direction = 1; //Scan direction (1 -> normal, -1 -> reverse)
         Point[] points = new Point[numpoints+1];
         if (start.getWavelenght() > finish.getWavelenght()) direction = -1;
@@ -33,13 +34,14 @@ public class LogicCommands
         hotSave.startHotSave(FileManager.getDateTimeStamp(dataset.getStarttime()));
         //**Cleaning all buffers
         try {
+            long flag;
             Engine.getConnection().cleanInputBuffer();
             Lockin.getConnection().cleanInputBuffer();
             for (int i = 0; i <= numpoints; i++) {
-
+                    flag = new Date().getTime();
                     points[i] = scanPoint(start.getWavelenght() + (scanstep * i * direction), delay);
                     for (PointRecipient r : listeners) r.newPoint(points[i]);
-                    MainMenu.updateStatus(i, numpoints);
+                    MainMenu.updateStatus(i, numpoints, flag);
                     if (Thread.interrupted()) throw new InterruptedException();
             }
         }
@@ -136,5 +138,10 @@ public class LogicCommands
             normalized[i] = new Point(data.getPoints()[i].getWavelenght(), x,y);
         }
         return new Dataset(normalized, data.getStarttime(), data.getFinishtime(), data.getDelay(), data.getStep(), data.getSample_name()+" [NORMALIZED]");
+    }
+
+    public static synchronized double getCurrentPosition() throws SerialPortException, IOException, InterruptedException
+    {
+        return Calibration.wavelenghtCalc(Engine.sendCommand(EngineByteCommands.getPosition()));
     }
 }

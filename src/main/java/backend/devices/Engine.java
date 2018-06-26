@@ -12,7 +12,7 @@ public class Engine {
         connection = engine;
     }
 
-    public static int sendCommand(int[] command) throws SerialPortException, IOException, InterruptedException {
+    public static synchronized int sendCommand(int[] command) throws SerialPortException, IOException, InterruptedException {
         int[] reply;
         try {
             connection.sendMessage(command);
@@ -29,7 +29,7 @@ public class Engine {
         return EngineByteCommands.getValue(reply);
     }
 
-    public static void waitMoving() throws SerialPortException, IOException, InterruptedException{
+    public static synchronized void waitMoving() throws SerialPortException, IOException, InterruptedException{
         while (true) {
             if (sendCommand(EngineByteCommands.getSpeed()) == 0) break;
             Thread.sleep(100);

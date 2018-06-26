@@ -35,14 +35,13 @@ public class Configurator {
         try {
             configin = new FileInputStream(configfile);
             props.load(configin);
+            configin.close();
         } catch (FileNotFoundException e) {
             ErrorProcessor.standartError("Config file not found", e);
             loadDefaultValues();
-            saveConfigFile();
         } catch (IOException e) {
             ErrorProcessor.standartError("Config file reading error ", e);
             loadDefaultValues();
-            saveConfigFile();
         }
         if (!readConfigValues())//If config has been damaged, it's loading default and try again
         {
@@ -80,18 +79,29 @@ public class Configurator {
 
     private void loadDefaultValues() {
         ServiceProcessor.serviceMessage("Using default config");
-        props.setProperty("engine_port", "COM4");
+        props.setProperty("engine_port", "COM0"); //Must be configed by user
         props.setProperty("engine_baud", "9600");
         props.setProperty("engine_databits", "8");
         props.setProperty("engine_stopbit", "1");
         props.setProperty("engine_parity", "0");
         props.setProperty("engine_delay", "25");
-        props.setProperty("lockin_port", "COM5");
+        props.setProperty("lockin_port", "COM0"); //Must be configed by user
         props.setProperty("lockin_baud", "19200");
         props.setProperty("lockin_databits", "8");
         props.setProperty("lockin_stopbit", "1");
         props.setProperty("lockin_parity", "0");
         props.setProperty("lockin_delay", "75");
+        saveConfigFile("DEFAULT CONFIG");
+    }
+
+    public void updateDeviceConfig(String device, String port, int baud_rate, int data_bits, int stopbit, int parity, int delay) throws FileNotFoundException, IOException{
+        props.setProperty(device + "_port", port);
+        props.setProperty(device + "_baud", "" + baud_rate);
+        props.setProperty(device + "_databits", "" + data_bits);
+        props.setProperty(device + "_stopbit", "" + stopbit);
+        props.setProperty(device + "_parity", "" + parity);
+        props.setProperty(device + "_delay", "" + delay);
+        saveConfigFile("USER CONFIG");
     }
 
     private void rewriteConfigFile() {
@@ -99,20 +109,20 @@ public class Configurator {
             configin.close();
             configfile.delete();
             configfile.createNewFile();
-            saveConfigFile();
+            loadDefaultValues();
         } catch (IOException e) {
             ErrorProcessor.standartError("fail to delete old config", e);
         }
     }
 
-    private void saveConfigFile() {
+    private void saveConfigFile(String comment) {
         try {
             configout = new FileOutputStream(configfile);
-            props.store(configout, "DEFAULT CONFIG");
+            props.store(configout, comment);
             configout.close();
             ServiceProcessor.serviceMessage("New config file is saved");
-        }  catch (Exception e) {
-            ErrorProcessor.standartError("fail to create default config file ", e);
+        } catch (Exception e) {
+            ErrorProcessor.standartError("fail to create/update config file ", e);
         }
     }
 

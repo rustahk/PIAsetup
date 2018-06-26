@@ -17,7 +17,10 @@ public class Logger implements ErrorRecipient, SystemRecipient {
 
     public static void init() throws IOException {
         startlogging = new Date();
-        log = new File(FileManager.maindir, FileManager.convertToFileName(FileManager.getDateTimeStamp(startlogging)) + " session.log");
+        File logdirectory = new File(FileManager.maindir+"\\"+FileManager.convertToFileName(FileManager.getDateStamp(new Date())) + " Logs");
+        logdirectory.mkdir();
+        if(!logdirectory.exists()) logdirectory.createNewFile();
+        log = new File(logdirectory, FileManager.convertToFileName(FileManager.getDateTimeStamp(startlogging)) + " session.log");
         log.createNewFile();
         logwriter = new FileWriter(log);
         addLogHead(FileManager.getDateTimeStamp(startlogging));

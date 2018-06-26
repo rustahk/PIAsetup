@@ -28,7 +28,6 @@ public class Connection {
 
     private int responcedelay; //COM port and devices are not infinity fast. This parameter give
 
-
     public Connection(String portname, int baudrate, int databits, int stopbits, int parity, int messagesize, boolean responceString, int responcedelay) {
         this.portname = portname;
         this.baudrate = baudrate;
@@ -263,6 +262,26 @@ public class Connection {
                 }
             }
         }
+    }
+
+    public int getBaudrate() {
+        return baudrate;
+    }
+
+    public int getDatabits() {
+        return databits;
+    }
+
+    public int getStopbits() {
+        return stopbits;
+    }
+
+    public int getParity() {
+        return parity;
+    }
+
+    public int getResponcedelay() {
+        return responcedelay;
     }
 }
 

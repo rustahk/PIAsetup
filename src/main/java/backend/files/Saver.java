@@ -8,6 +8,7 @@ import backend.data.Point;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Date;
 import java.util.LinkedList;
 
 public class Saver {
@@ -15,7 +16,10 @@ public class Saver {
     public static boolean saveDataset(Dataset dataset) {
         File scanfile;
         try {
-            scanfile = new File(FileManager.mainfile.getAbsolutePath(), FileManager.convertToFileName(FileManager.getDateTimeStamp(dataset.getStarttime())) +" " + dataset.getSample_name() +" Scan.txt");
+            File savedir = new File(FileManager.maindir+"\\"+"Scans");
+            savedir.mkdir();
+            if(!savedir.exists()) savedir.createNewFile();
+            scanfile = new File(savedir.getAbsolutePath(), FileManager.convertToFileName(FileManager.getDateTimeStamp(dataset.getStarttime())) +" " + dataset.getSample_name() +" Scan.txt");
             scanfile.createNewFile();
             FileWriter scanwriter = new FileWriter(scanfile, false);
             scanHead(dataset, scanwriter);

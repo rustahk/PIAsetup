@@ -17,6 +17,7 @@ public class Initializer {
     private static Connection engine_connection;
     private static Connection lockin_connection;
     private static Configurator config;
+    //private static boolean upd_params;
 
     public static void fullInit() throws Exception {
         initLogger();
@@ -82,5 +83,9 @@ public class Initializer {
             } else throw e;
         }
         ServiceProcessor.serviceMessage("Lockin: OK");
+    }
+
+    public static Configurator getConfig() {
+        return config;
     }
 }

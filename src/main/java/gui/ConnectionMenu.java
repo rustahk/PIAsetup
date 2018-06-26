@@ -1,5 +1,6 @@
 package gui;
 
+import backend.core.Initializer;
 import backend.core.ServiceProcessor;
 import backend.devices.Connection;
 import backend.devices.Engine;
@@ -10,10 +11,7 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.MenuButton;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
@@ -22,6 +20,7 @@ import jssc.SerialPort;
 import jssc.SerialPortException;
 
 import java.io.IOException;
+import java.util.Optional;
 
 
 public class ConnectionMenu {
@@ -33,8 +32,8 @@ public class ConnectionMenu {
     private MenuButton parity;
     private TextField delay_field;
     private Stage connectionWindow;
-    private final String engine_name = "Engine";
-    private final String lockin_name = "Lockin";
+    private final String engine_name = "engine";
+    private final String lockin_name = "lockin";
     private final String[] parities = new String[5];
     private boolean critical;
 
@@ -171,26 +170,27 @@ public class ConnectionMenu {
     private boolean connectTo() {
 
         try {
+            Connection connection;
             if (device.getText().equals(engine_name)) {
                 ServiceProcessor.serviceMessage("Try to reconnect " + device.getText().equals(engine_name));
-                Connection engine = createConnection(9, false);
+                connection = createConnection(9, false);
                 if (Engine.getConnection() != null && Engine.getConnection().isOpened())
                     Engine.getConnection().disconnect();
-                Engine.init(engine);
-                engine.connect();
+                Engine.init(connection);
+                connection.connect();
             } else if (device.getText().equals(lockin_name)) {
                 ServiceProcessor.serviceMessage("Try to reconnect " + device.getText().equals(engine_name));
-                Connection lockin = createConnection(0, true);
+                connection = createConnection(0, true);
                 if (Lockin.getConnection() != null && Lockin.getConnection().isOpened())
                     Lockin.getConnection().disconnect();
-                Lockin.init(lockin);
-                lockin.connect();
+                Lockin.init(connection);
+                connection.connect();
             } else {
                 throw new IOException("Device is not chosen");
             }
             MainMenu.infoMessage("Connection", "Reconnect to " + device.getText() + ": OK", port.getText());
-            if(critical)
-            {
+            updateConfigDialog(device.getText(), connection);
+            if (critical) {
                 critical = false;
                 connectionWindow.close();
             }
@@ -268,31 +268,48 @@ public class ConnectionMenu {
         }
     }
 
-    public boolean restartEngineConnection()
-    {
+    public boolean restartEngineConnection() {
         device.setText(engine_name);
         return restartDevice();
     }
 
-    public boolean restartLockinConnection()
-    {
+    public boolean restartLockinConnection() {
         device.setText(lockin_name);
         return restartDevice();
     }
-    private boolean restartDevice()
-    {
+
+    private boolean restartDevice() {
         critical = true;
         device.setDisable(true);
         updatePortList();
         connectionWindow.showAndWait();
-        if(critical)
-        {
+        if (critical) {
             return !critical;
-        }
-        else
-        {
+        } else {
             device.setDisable(false);
             return true;
+        }
+    }
+
+    private void updateConfigDialog(String device, Connection connection) {
+        Alert confirm_cancel = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm_cancel.setTitle("Connection");
+        confirm_cancel.setHeaderText(device + " connection is updated\nConfirm save to config file?");
+        Optional<ButtonType> option = confirm_cancel.showAndWait();
+        if (option.get() == null) {
+            //Nothing
+        } else if (option.get() == ButtonType.OK) {
+            try {
+                Initializer.getConfig().updateDeviceConfig(device, connection.getPortname(), connection.getBaudrate(), connection.getDatabits(), connection.getStopbits(), connection.getParity(), connection.getResponcedelay());
+            }
+            catch (Exception e)
+            {
+                MainMenu.errorMessage("Config", "Fail to update config", e.toString(), e);
+            }
+        } else if (option.get() == ButtonType.CANCEL) {
+            //Nothing
+        } else {
+            //Nothing
         }
     }
 }

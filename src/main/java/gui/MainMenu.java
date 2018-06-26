@@ -56,9 +56,12 @@ public class MainMenu extends Application implements PointRecipient {
     private Button start_button;
     private Button stop_button;
     //Bottom status fields
-    ProgressBar progressBar;
+    private ProgressBar progressBar;
+    private static TextField finishtime;
+    private static TextField engine_position;
     //Task
     private static Scanning scan_task;
+    private static Positioning position_monitor_task;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -80,7 +83,7 @@ public class MainMenu extends Application implements PointRecipient {
         }
     }
 
-    private void loadMenu(Stage primaryStage) {
+    public void loadMenu(Stage primaryStage) {
         BorderPane root = loadRoot();
         loadCenter(root);
         loadTop(root);
@@ -108,10 +111,16 @@ public class MainMenu extends Application implements PointRecipient {
                 } catch (NullPointerException e) {
                     //Nothing, it means that task doesn't exist
                 }
+                finally {
+                    position_monitor_task.cancel(true);
+                }
             }
         });
         primaryStage.show();
         CalibrationMenu.openDialog();
+        finishtime.setText("READY");
+        position_monitor_task = new Positioning();
+        new Thread(position_monitor_task).start();
     }
 
     private BorderPane loadRoot() {
@@ -210,11 +219,17 @@ public class MainMenu extends Application implements PointRecipient {
     private void loadBottom(BorderPane root) {
         progressBar = new ProgressBar(0);
         progressBar.setPrefWidth(200);
+        engine_position = new TextField();
+        finishtime = new TextField();
         HBox hbox = new HBox();
         hbox.setSpacing(10);
         hbox.setPadding(new Insets(5, 5, 5, 5));
-        hbox.getChildren().addAll(progressBar);
+        hbox.getChildren().addAll(engine_position, finishtime ,progressBar);
         hbox.setAlignment(Pos.BOTTOM_RIGHT);
+        //
+        engine_position.setEditable(false);
+        finishtime.setEditable(false);
+        //
         root.setBottom(hbox);
     }
 
@@ -329,6 +344,7 @@ public class MainMenu extends Application implements PointRecipient {
                 MainMenu.infoMessage("Scan", "Scan finished", "File saved");
                 scanEnd();
                 if (autoreturn) LogicCommands.moveTo(new Point(start_wavelenght));
+                finishtime.setText("SCAN SUCCEEDED");
             }
         });
         scan_task.addEventHandler(WorkerStateEvent.WORKER_STATE_CANCELLED, new EventHandler<WorkerStateEvent>() {
@@ -337,6 +353,7 @@ public class MainMenu extends Application implements PointRecipient {
                 MainMenu.warningMessage("Scan interrupted by user", "Final file hasn't been saved correct", null);
                 scanEnd();
                 if (autoreturn) LogicCommands.moveTo(new Point(start_wavelenght));
+                finishtime.setText("SCAN CANCELLED");
             }
         });
         scan_task.addEventHandler(WorkerStateEvent.WORKER_STATE_FAILED, new EventHandler<WorkerStateEvent>() {
@@ -345,6 +362,7 @@ public class MainMenu extends Application implements PointRecipient {
                 MainMenu.errorMessage("Scan interrupted", "Scan interrupted by system", "Final file hasn't been saved correct", null);
                 scanEnd();
                 progressBar.setProgress(0);
+                finishtime.setText("SCAN FAILED");
             }
         });
         new Thread(scan_task).start();
@@ -434,8 +452,13 @@ public class MainMenu extends Application implements PointRecipient {
         }
     }
 
-    public static void updateStatus(double workDone, double total) {
+    public static void updateStatus(int workDone, int total, long time_flag) {
         if (scan_task != null) scan_task.updateInnerStatus(workDone, total);
+        if(finishtime != null)
+        {
+            time_flag=(new Date().getTime()-time_flag)*(total-workDone);
+            updateFinishTime(time_flag);
+        }
     }
 
     private void clearPlot() {
@@ -445,6 +468,55 @@ public class MainMenu extends Application implements PointRecipient {
 
     public static ConnectionMenu getConnectionMenu() {
         return connectionMenu;
+    }
+
+    public static synchronized void showPosition(double wavelenght)
+    {
+        Platform.runLater(new Runnable() {
+            public void run() {
+                engine_position.setText("Position: "+ wavelenght + " nm");
+            }
+        });
+
+    }
+
+    private class Positioning extends Task<Void>
+    {
+        private final int upd_freqency = 250;
+
+        @Override
+        protected Void call() throws Exception {
+            ServiceProcessor.serviceMessage("Position monitor activated");
+            try
+            {
+                while(!isCancelled())
+                {
+                    showPosition(LogicCommands.getCurrentPosition());
+                    Thread.sleep(upd_freqency);
+                }
+            }
+            catch (InterruptedException e)
+            {
+                //Nothing, just stop
+            }
+            catch (Exception e)
+            {
+                ErrorProcessor.standartError("Position monitor" ,e);
+            }
+            ServiceProcessor.serviceMessage("Position monitor disactivated");
+            return null;
+        }
+    }
+
+    private static void updateFinishTime(long time)
+    {
+
+        Platform.runLater(new Runnable() {
+            public void run() {
+        final long time_s = time/1000;
+        finishtime.setText("Time to finish: " + (int) time_s/60 + "min " + (int) time%60 + "sec");
+            }
+        });
     }
 }
 

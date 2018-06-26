@@ -29,6 +29,7 @@ public class CalibrationMenu {
                 if(LogicCommands.calibratePosition(new Point(value)))
                 {
                     ServiceProcessor.serviceMessage("Position updated: " + value + " nm");
+                    MainMenu.showPosition(value);
                     calibrated = true;
                 }
                 else {

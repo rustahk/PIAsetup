@@ -457,7 +457,7 @@ public class MainMenu extends Application implements PointRecipient {
         if(finishtime != null)
         {
             time_flag=(new Date().getTime()-time_flag)*(total-workDone);
-            updateFinishTime(time_flag);
+            updateFinishTime(time_flag, workDone);
         }
     }
 
@@ -508,13 +508,14 @@ public class MainMenu extends Application implements PointRecipient {
         }
     }
 
-    private static void updateFinishTime(long time)
+    private static void updateFinishTime(long time, int npoint)
     {
 
         Platform.runLater(new Runnable() {
             public void run() {
         final long time_s = time/1000;
-        finishtime.setText("Time to finish: " + (int) time_s/60 + "min " + (int) time%60 + "sec");
+        //finishtime.setText("Time to finish: " + (int) time_s/60 + "min " + (int) time%60 + "sec");
+        finishtime.setText("Point #" +npoint + " Time: " + time_s);
             }
         });
     }

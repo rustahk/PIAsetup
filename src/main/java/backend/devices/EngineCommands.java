@@ -12,7 +12,7 @@ EXAMPLE: (rotate right, speed 500) ROR 500 = {0x01, 0x01, 0x00, 0x00,0x00,0x00, 
 */
 
 
-public class EngineByteCommands {
+public class EngineCommands {
 
     private final static int module_address = 0x01;
     private final static int motor_number = 0x00;

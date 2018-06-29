@@ -24,7 +24,7 @@ public class Connection {
     private boolean responceString;
     private int messagesize;
 
-    private static LinkedList<SerialPort> opened_ports = new LinkedList<SerialPort>();
+    private static LinkedList<Connection> connections = new LinkedList<Connection>();
 
     private int responcedelay; //COM port and devices are not infinity fast. This parameter give
 
@@ -48,7 +48,7 @@ public class Connection {
         if (responceString) portreader = new StringPortReader();
         else portreader = new BytePortReader();
         port.addEventListener(portreader, SerialPort.MASK_RXCHAR);
-        addNewPort(port);
+        addNewConnection(this);
         ServiceProcessor.serviceMessage(portname + " connection: OK");
     }
 
@@ -70,20 +70,20 @@ public class Connection {
         }
         return reply;
     }
-    public void cleanInputBuffer() throws NullPointerException
-    {
-        try
+
+    public static void cleanInputBuffer() throws NullPointerException {
+        for(Connection i : connections)
         {
-            portreader.cleanInput();
-        }
-        catch (NullPointerException e)
-        {
-            ErrorProcessor.standartError(this.portname + " reader wasn't open", e);
-            throw e;
+            try {
+                i.portreader.cleanInput();
+            } catch (NullPointerException e) {
+                ErrorProcessor.standartError(i.portname + " reader wasn't open", e);
+                throw e;
+            }
         }
     }
 
-    public String getStringResponce() throws IOException, InterruptedException {
+    public String getStringResponce() throws InterruptedException {
         Thread.sleep(responcedelay);
         return portreader.readString();
     }
@@ -97,6 +97,7 @@ public class Connection {
             port.closePort();
             ServiceProcessor.serviceMessage(portname + " disconnected");
         }
+        connections.remove(this);
     }
 
     private class BytePortReader extends PortReader {
@@ -125,8 +126,7 @@ public class Connection {
             return null;
         }
 
-        public void cleanInput()
-        {
+        public void cleanInput() {
             list = new LinkedList<Byte>();
         }
     }
@@ -144,8 +144,7 @@ public class Connection {
             }
         }
 
-        public void cleanInput()
-        {
+        public void cleanInput() {
             list = new LinkedList<String>();
         }
 
@@ -169,23 +168,18 @@ public class Connection {
         @Override
         public String readString() {
             String msg = "";
-            while(true)
-            {
-                while(list.size() == 0)
-                {
-                    try
-                    {
+            while (true) {
+                while (list.size() == 0) {
+                    try {
                         Thread.sleep(10);
-                    }
-                    catch (InterruptedException e)
-                    {
+                    } catch (InterruptedException e) {
                         ErrorProcessor.standartError("Reading interrupted", e);
                         return null;
                     }
                 }
                 char i = list.poll();
-                msg+=i;
-                if(i == '\r') break;
+                msg += i;
+                if (i == '\r') break;
             }
             return msg;
         }
@@ -216,49 +210,32 @@ public class Connection {
 
     private abstract class PortReader extends InputStream implements SerialPortEventListener {
         public abstract String readString();
+
         public abstract void serialEvent(SerialPortEvent event);
+
         public abstract void cleanInput();
 
     }
 
-    public static String[] getPortNames()
-    {
+    public static String[] getPortNames() {
         return SerialPortList.getPortNames();
     }
 
-    public boolean isOpened()
-    {
+    public boolean isOpened() {
         return port.isOpened();
     }
 
-    private static void addNewPort(SerialPort p)
-    {
-        opened_ports.add(p);
+    private static void addNewConnection(Connection c) {
+        connections.add(c);
     }
 
-    public static void cleanPorts()
-    {
-        for(SerialPort i : opened_ports)
-        {
-            if(i!=null)
-            {
-                try
-                {
-                    i.removeEventListener();;
-                }
-                catch (SerialPortException e)
-                {
-                    ErrorProcessor.standartError("Fail to remove port listener", e);
-                }
-                if(i.isOpened())
-                {
-                    try {
-                        i.closePort();
-                    }
-                    catch (SerialPortException e)
-                    {
-                        ErrorProcessor.standartError("Fail to close port", e);
-                    }
+    public static void cleanConnections() {
+        for (Connection i : connections) {
+            if (i != null && i.isOpened()) {
+                try {
+                    i.disconnect();
+                } catch (Exception e) {
+                    ErrorProcessor.standartError("Fail to close connection", e);
                 }
             }
         }

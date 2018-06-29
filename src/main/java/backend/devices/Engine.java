@@ -5,38 +5,55 @@ import jssc.SerialPortException;
 
 import java.io.IOException;
 
-public class Engine {
-    private static Connection connection;
+public class Engine implements Connectable {
 
-    public static void init(Connection engine) {
-        connection = engine;
+    private static Engine engine;
+
+    private Connection connection;
+
+    public Engine(Connection connection) {
+        this.connection = connection;
+        engine = this;
     }
 
     public static synchronized int sendCommand(int[] command) throws SerialPortException, IOException, InterruptedException {
         int[] reply;
         try {
-            connection.sendMessage(command);
+            engine.connection.sendMessage(command);
         } catch (SerialPortException e) {
             ErrorProcessor.standartError("Engine connection problem", e);
             throw e;
         }
-        reply = connection.getByteResponce();
-        if (!EngineByteCommands.commandStatus(command, reply)) {
+        reply = engine.connection.getByteResponce();
+        if (!EngineCommands.commandStatus(command, reply)) {
             IOException e = new IOException("Engine wrong responce");
             ErrorProcessor.standartError("Engine responce problem", e);
             throw e;
         }
-        return EngineByteCommands.getValue(reply);
+        return EngineCommands.getValue(reply);
     }
 
-    public static synchronized void waitMoving() throws SerialPortException, IOException, InterruptedException{
-        while (true) {
-            if (sendCommand(EngineByteCommands.getSpeed()) == 0) break;
-            Thread.sleep(100);
-        }
+    public void cleanInputBuffer() {
+        connection.cleanInputBuffer();
     }
 
-    public static Connection getConnection() {
+    @Override
+    public void connect() throws SerialPortException{
+        connection.connect();
+    }
+
+    @Override
+    public void reconnect(Connection connection) throws SerialPortException{
+        if(this.connection!=null && this.connection.isOpened()) this.connection.disconnect();
+        this.connection = connection;
+        this.connection.connect();
+    }
+
+    public static Engine getEngine() {
+        return engine;
+    }
+
+    public Connection getConnection() {
         return connection;
     }
 }

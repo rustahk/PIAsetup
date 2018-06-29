@@ -5,16 +5,15 @@ import org.junit.Test;
 
 public class CalibrationTest {
 
-    private final int speed = 2000;
-    Calibration calibration;
+
 
     @Before
     public void init() {
-        calibration = new Calibration();
+        Calibration.updFreqCalibr(200);
     }
 
     @Test
-    public void testSpeedLimit() {
-        Assert.assertTrue(calibration.speedLimit(speed));
+    public void testFreqCalc() {
+        Assert.assertEquals(7.5, Calibration.voltageChpCalc(100), 0.0);
     }
 }

@@ -1,33 +1,46 @@
 package backend.core;
 
-import backend.devices.Connection;
-import backend.devices.Engine;
-import backend.devices.Lockin;
-import backend.devices.LockinStringCommands;
+import backend.devices.*;
 import backend.files.Configurator;
 import backend.files.FileManager;
 import backend.files.Logger;
-import gui.ConnectionMenu;
 import gui.MainMenu;
-import jssc.SerialPortException;
 
 import java.util.Date;
 
 public class Initializer {
-    private static Connection engine_connection;
-    private static Connection lockin_connection;
+
     private static Configurator config;
-    //private static boolean upd_params;
 
     public static void fullInit() throws Exception {
         initLogger();
         initConfig();
+        initCalibr();
         initEngine();
         initLockin();
+        initPower();
+        initLaser();
+        initLamp();
+        initChopper();
     }
 
     public static void fullClose() {
-        Connection.cleanPorts();
+        try {
+            Laser.sendCommand(LaserCommands.closeShutter());
+        } catch (Exception e) {
+            ErrorProcessor.standartError("Fail to close laser shutter", e);
+        }
+        try {
+            Laser.sendCommand(LaserCommands.switchOff());
+        } catch (Exception e) {
+            ErrorProcessor.standartError("Fail to activate laser stand-by mode", e);
+        }
+        try {
+            Power.sendCommand(PowerSupplyCommands.switchOff());
+        } catch (Exception e) {
+            ErrorProcessor.standartError("Fail to switch off power output", e);
+        }
+        Connection.cleanConnections();
         ServiceProcessor.serviceMessage(FileManager.getDateTimeStamp(new Date()) + " #Session finish");
     }
 
@@ -55,9 +68,8 @@ public class Initializer {
 
     public static void initEngine() throws Exception {
         try {
-            engine_connection = new Connection(config.getEngine_port(), config.getEngine_baud(), config.getEngine_databits(), config.getEngine_stopbit(), config.getEngine_parity(), 9, false, config.getEngine_delay());
-            Engine.init(engine_connection);
-            engine_connection.connect();
+            new Engine(config.getEngine_connection());
+            Engine.getEngine().connect();
         } catch (Exception e) {
             ErrorProcessor.standartError("Engine: FAIL", e);
             MainMenu.errorMessage("Connection", "Engine connection failed. Try to connect manually", e.toString(), e);
@@ -71,10 +83,9 @@ public class Initializer {
     public static void initLockin() throws Exception {
 
         try {
-            lockin_connection = new Connection(config.getLockin_port(), config.getLockin_baud(), config.getLockin_databits(), config.getLockin_stopbit(), config.getLockin_parity(), 0, true, config.getLockin_delay());
-            Lockin.init(lockin_connection);
-            lockin_connection.connect();
-            Lockin.sendCommand(LockinStringCommands.setOutInterface());
+            new Lockin(config.getLockin_connection());
+            Lockin.getLockin().connect();
+            Lockin.sendCommand(LockinCommands.setOutInterface());
         } catch (Exception e) {
             MainMenu.errorMessage("Connection", "Lockin connection failed. Try to connect manually", e.toString(), e);
             ErrorProcessor.standartError("Lockin: FAIL", e);
@@ -83,6 +94,76 @@ public class Initializer {
             } else throw e;
         }
         ServiceProcessor.serviceMessage("Lockin: OK");
+    }
+
+    public static void initPower() throws Exception {
+
+        try {
+            new Power(config.getPower_connection());
+            Power.getPower().connect();
+        } catch (Exception e) {
+            MainMenu.errorMessage("Connection", "Power connection failed. Try to connect manually", e.toString(), e);
+            ErrorProcessor.standartError("Power: FAIL", e);
+            if (MainMenu.getConnectionMenu().restartPowerConnection()) {
+                //Nothing
+            } else throw e;
+        }
+        ServiceProcessor.serviceMessage("Power: OK");
+    }
+
+    public static void initLaser() throws Exception {
+
+        try {
+            new Laser(config.getLaser_connection());
+            Laser.getLaser().connect();
+        } catch (Exception e) {
+            MainMenu.errorMessage("Connection", "Laser connection failed. Try to connect manually", e.toString(), e);
+            ErrorProcessor.standartError("Laser: FAIL", e);
+            if (MainMenu.getConnectionMenu().restartLaserConnection()) {
+                //Nothing
+            } else throw e;
+        }
+        ServiceProcessor.serviceMessage("Laser: OK");
+    }
+
+    public static void initCalibr() throws Exception {
+        try
+        {
+            Calibration.init(config.getCalibration());
+            ServiceProcessor.serviceMessage("Limits: OK");
+        }
+        catch (Exception e)
+        {
+            ErrorProcessor.standartError("Limits: FAIL", e);
+        }
+    }
+
+    public static void initLamp() throws Exception {
+
+        try {
+            new Lamp(config.getLamp());
+        } catch (Exception e) {
+            MainMenu.errorMessage("Connection", "Lamp connection failed", e.toString(), e);
+            ErrorProcessor.standartError("Lamp: FAIL", e);
+            if (MainMenu.getConnectionMenu().restartLockinConnection()) {
+                //Nothing
+            } else throw e;
+        }
+        ServiceProcessor.serviceMessage("Lamp: OK");
+    }
+
+    public static void initChopper() throws Exception {
+
+        try {
+            new Chopper(config.getChopper());
+        } catch (Exception e) {
+            MainMenu.errorMessage("Connection", "Chopper connection failed", e.toString(), e);
+            ErrorProcessor.standartError("Chopper: FAIL", e);
+            if (MainMenu.getConnectionMenu().restartLockinConnection()) {
+                //Nothing
+            } else throw e;
+        }
+        ServiceProcessor.serviceMessage("Chopper: OK");
     }
 
     public static Configurator getConfig() {

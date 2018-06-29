@@ -166,7 +166,7 @@ public class ConsoleProcessor {
                 inDouble = enterDouble();
                 point = new Point(inDouble);
             } else {
-                output.unloggedMessage("POSITION (" + Calibration.getMinwstep() + ".." + Calibration.getMaxwstep() + "): ");
+                output.unloggedMessage("POSITION (" + Calibration.getMin_work_step() + ".." + Calibration.getMax_work_step() + "): ");
                 inInt = enterInt();
                 point = new Point(Calibration.positionCalc(inInt),inInt);
             }

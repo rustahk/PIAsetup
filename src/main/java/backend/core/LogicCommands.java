@@ -35,8 +35,7 @@ public class LogicCommands
         //**Cleaning all buffers
         try {
             long flag;
-            Engine.getConnection().cleanInputBuffer();
-            Lockin.getConnection().cleanInputBuffer();
+            Connection.cleanInputBuffer();
             for (int i = 0; i <= numpoints; i++) {
                     flag = new Date().getTime();
                     points[i] = scanPoint(start.getWavelenght() + (scanstep * i * direction), delay);
@@ -59,8 +58,8 @@ public class LogicCommands
     public static boolean calibratePosition(Point currentpoint)
     {
         try {
-            Engine.sendCommand(EngineByteCommands.setPosition(currentpoint.getPosition()));
-            Engine.sendCommand(EngineByteCommands.motorStop()); //After first calibration motor try to move
+            Engine.sendCommand(EngineCommands.setPosition(currentpoint.getPosition()));
+            Engine.sendCommand(EngineCommands.motorStop()); //After first calibration motor try to move
         }
         catch (SerialPortException e)
         {
@@ -85,10 +84,10 @@ public class LogicCommands
     private static Point scanPoint(double wavelenght, int delay) throws IOException, SerialPortException, InterruptedException
     {
         Point point = new Point(wavelenght);
-        Engine.sendCommand(EngineByteCommands.moveTo(point.getPosition()));
-        Engine.waitMoving();
+        Engine.sendCommand(EngineCommands.moveTo(point.getPosition()));
+        waitMoving();
         Thread.sleep(delay);
-        String value = Lockin.sendCommand(LockinStringCommands.getOutputXY());
+        String value = Lockin.sendCommand(LockinCommands.getOutputXY());
         if (value.equals("")) //This is here, because usually Lockin hasn't answer
         {
             throw new IOException("no value from lockin");
@@ -118,7 +117,7 @@ public class LogicCommands
     public static void moveTo(Point target)
     {
         try {
-            Engine.sendCommand(EngineByteCommands.moveTo(target.getPosition()));
+            Engine.sendCommand(EngineCommands.moveTo(target.getPosition()));
         }
         catch (Exception e)
         {
@@ -142,6 +141,13 @@ public class LogicCommands
 
     public static synchronized double getCurrentPosition() throws SerialPortException, IOException, InterruptedException
     {
-        return Calibration.wavelenghtCalc(Engine.sendCommand(EngineByteCommands.getPosition()));
+        return Calibration.wavelenghtCalc(Engine.sendCommand(EngineCommands.getPosition()));
+    }
+
+    private static synchronized void waitMoving() throws SerialPortException, IOException, InterruptedException{
+        while (true) {
+            if (Engine.sendCommand(EngineCommands.getSpeed()) == 0) break;
+            Thread.sleep(100);
+        }
     }
 }

@@ -7,10 +7,7 @@ import backend.core.LogicCommands;
 import backend.core.ServiceProcessor;
 import backend.data.Dataset;
 import backend.data.Point;
-import backend.devices.Calibration;
-import backend.devices.Engine;
-import backend.devices.EngineByteCommands;
-import backend.files.FileManager;
+import backend.devices.*;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -29,7 +26,6 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import jssc.SerialPortException;
-import sun.applet.Main;
 
 import java.io.IOException;
 import java.util.Date;
@@ -58,10 +54,13 @@ public class MainMenu extends Application implements PointRecipient {
     //Bottom status fields
     private ProgressBar progressBar;
     private static TextField finishtime;
-    private static TextField engine_position;
+    private static TextField engine_status;
+    private static TextField lamp_status;
+    private static TextField chopper_status;
+    private static TextField laser_status;
     //Task
     private static Scanning scan_task;
-    private static Positioning position_monitor_task;
+    private static Status position_monitor_task;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -119,7 +118,7 @@ public class MainMenu extends Application implements PointRecipient {
         primaryStage.show();
         CalibrationMenu.openDialog();
         finishtime.setText("READY");
-        position_monitor_task = new Positioning();
+        position_monitor_task = new Status();
         new Thread(position_monitor_task).start();
     }
 
@@ -205,7 +204,7 @@ public class MainMenu extends Application implements PointRecipient {
                     //Nothing, task didn't exist
                 }
                 try {
-                    Engine.sendCommand(EngineByteCommands.motorStop());
+                    Engine.sendCommand(EngineCommands.motorStop());
 
                 } catch (Exception e) {
                     errorMessage("STOP", "Fail to interrupt engine moving", e.toString(), e);
@@ -219,15 +218,21 @@ public class MainMenu extends Application implements PointRecipient {
     private void loadBottom(BorderPane root) {
         progressBar = new ProgressBar(0);
         progressBar.setPrefWidth(200);
-        engine_position = new TextField();
+        lamp_status = new TextField();
+        chopper_status = new TextField();
+        laser_status = new TextField();
+        engine_status = new TextField();
         finishtime = new TextField();
         HBox hbox = new HBox();
         hbox.setSpacing(10);
         hbox.setPadding(new Insets(5, 5, 5, 5));
-        hbox.getChildren().addAll(engine_position, finishtime ,progressBar);
+        hbox.getChildren().addAll(lamp_status, laser_status, chopper_status, engine_status, finishtime ,progressBar);
         hbox.setAlignment(Pos.BOTTOM_RIGHT);
         //
-        engine_position.setEditable(false);
+        lamp_status.setEditable(false);
+        chopper_status.setEditable(false);
+        laser_status.setEditable(false);
+        engine_status.setEditable(false);
         finishtime.setEditable(false);
         //
         root.setBottom(hbox);
@@ -334,7 +339,6 @@ public class MainMenu extends Application implements PointRecipient {
             wrongValue(e.getMessage(), null);
             return;
         }
-        position_monitor_task.cancel(true);
         scan_task = new Scanning(name, new Point(start_wavelenght), new Point(finish_wavelenght), points_number, delay);
         progressBar.progressProperty().unbind();
         progressBar.progressProperty().bind(scan_task.progressProperty());
@@ -476,24 +480,65 @@ public class MainMenu extends Application implements PointRecipient {
     {
         Platform.runLater(new Runnable() {
             public void run() {
-                engine_position.setText("Position: " + String.format("%8.2f", wavelenght) + " nm");
+                engine_status.setText("Position: " + String.format("%8.2f", wavelenght) + " nm");
             }
         });
 
     }
-
-    private class Positioning extends Task<Void>
+    public static synchronized void showFrequency(double freq, double voltage)
     {
-        private final int upd_freqency = 250;
+        Platform.runLater(new Runnable() {
+            public void run() {
+                chopper_status.setText("Chopper: " + String.format("%8.2f", freq) + "Hz " + String.format("%8.2f", voltage)+ "V");
+            }
+        });
+
+    }
+    public static synchronized void showLamp(double v_detected, double i_detected)
+    {
+        Platform.runLater(new Runnable() {
+            public void run() {
+                engine_status.setText("Lamp: " + String.format("%8.2f", v_detected) + "V, "+ String.format("%8.2f", i_detected) + "A");
+            }
+        });
+
+    }
+    public static synchronized void showLaser(boolean open, double power)
+    {
+        String status;
+        if(open) status = "OPEN ";
+        else status = "CLOSE ";
+        Platform.runLater(new Runnable() {
+            public void run() {
+                engine_status.setText("Laser: " + status + String.format("%8.2f", power) + "W");
+            }
+        });
+    }
+    public static synchronized void showLaserWarmup(int percent)
+    {
+        Platform.runLater(new Runnable() {
+            public void run() {
+                engine_status.setText("Laser: warmup " + percent + "%");
+            }
+        });
+    }
+
+
+    private class Status extends Task<Void>
+    {
+        private final int upd_freqency = 200;
 
         @Override
         protected Void call() throws Exception {
-            ServiceProcessor.serviceMessage("Position monitor activated");
+            ServiceProcessor.serviceMessage("Status monitor activated");
             try
             {
                 while(!isCancelled())
                 {
-                    showPosition(LogicCommands.getCurrentPosition());
+                    if(scan_task==null || !scan_task.isRunning())showPosition(LogicCommands.getCurrentPosition());
+                    showLamp(Lamp.getLamp().getRealVolage(), Lamp.getLamp().getRealCurrent());
+                    showFrequency(Double.valueOf(Lockin.sendCommand(LockinCommands.getRefFreq())), Chopper.getChopper().getRealVolage());
+                    showLaser(Boolean.valueOf(Laser.sendCommand(LaserCommands.getShutterStatus())), Double.valueOf(Laser.sendCommand(LaserCommands.getPower())));
                     Thread.sleep(upd_freqency);
                 }
             }
@@ -505,7 +550,7 @@ public class MainMenu extends Application implements PointRecipient {
             {
                 ErrorProcessor.standartError("Position monitor" ,e);
             }
-            ServiceProcessor.serviceMessage("Position monitor disactivated");
+            ServiceProcessor.serviceMessage("Status monitor disactivated");
             return null;
         }
     }

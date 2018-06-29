@@ -5,24 +5,26 @@ import jssc.SerialPortException;
 
 import java.io.IOException;
 
-public class Lockin implements Connectable {
-    private static Lockin lockin;
+public class Power implements Connectable {
+
+    private static Power power;
     private Connection connection;
 
-    public Lockin(Connection connection) {
+    public Power(Connection connection) {
         this.connection = connection;
-        lockin = this;
+        power = this;
     }
 
     public static synchronized String sendCommand(String command) throws SerialPortException, IOException, InterruptedException //return String of Lockin reply
     {
         try {
-            lockin.connection.sendMessage(command);
+            power.connection.sendMessage(command);
         } catch (SerialPortException e) {
-            ErrorProcessor.standartError("Lockin connection problem", e);
+            ErrorProcessor.standartError("Power connection problem", e);
             throw e;
         }
-        return lockin.connection.getStringResponce();
+
+        return power.connection.getStringResponce();
     }
 
     public void cleanInputBuffer() {
@@ -41,8 +43,8 @@ public class Lockin implements Connectable {
         this.connection.connect();
     }
 
-    public static Lockin getLockin() {
-        return lockin;
+    public static Power getPower() {
+        return power;
     }
 
     public Connection getConnection() {

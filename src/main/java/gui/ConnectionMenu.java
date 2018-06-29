@@ -34,6 +34,8 @@ public class ConnectionMenu {
     private Stage connectionWindow;
     private final String engine_name = "engine";
     private final String lockin_name = "lockin";
+    private final String power_name = "power";
+    private final String laser_name = "laser";
     private final String[] parities = new String[5];
     private boolean critical;
 
@@ -71,6 +73,24 @@ public class ConnectionMenu {
             }
         });
         device.getItems().addAll(lockin);
+        //Power:
+        MenuItem power = new MenuItem(power_name);
+        power.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                device.setText(power_name);
+            }
+        });
+        device.getItems().addAll(power);
+        //Laser:
+        MenuItem laser = new MenuItem(laser_name);
+        laser.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                device.setText(laser_name);
+            }
+        });
+        device.getItems().addAll(laser);
         //Baud_rate
         for (int i = 0; i <= 5; i++) {
             int value = (int) Math.pow(2, i) * 1200;
@@ -174,16 +194,16 @@ public class ConnectionMenu {
             if (device.getText().equals(engine_name)) {
                 ServiceProcessor.serviceMessage("Try to reconnect " + device.getText().equals(engine_name));
                 connection = createConnection(9, false);
-                if (Engine.getConnection() != null && Engine.getConnection().isOpened())
-                    Engine.getConnection().disconnect();
-                Engine.init(connection);
+                if (Engine.getEngine().getConnection() != null && Engine.getEngine().getConnection().isOpened())
+                    Engine.getEngine().getConnection().disconnect();
+                new Engine(connection);
                 connection.connect();
             } else if (device.getText().equals(lockin_name)) {
                 ServiceProcessor.serviceMessage("Try to reconnect " + device.getText().equals(engine_name));
                 connection = createConnection(0, true);
-                if (Lockin.getConnection() != null && Lockin.getConnection().isOpened())
-                    Lockin.getConnection().disconnect();
-                Lockin.init(connection);
+                if (Lockin.getLockin().getConnection() != null && Lockin.getLockin().getConnection().isOpened())
+                    Lockin.getLockin().getConnection().disconnect();
+                new Lockin(connection);
                 connection.connect();
             } else {
                 throw new IOException("Device is not chosen");
@@ -275,6 +295,16 @@ public class ConnectionMenu {
 
     public boolean restartLockinConnection() {
         device.setText(lockin_name);
+        return restartDevice();
+    }
+    public boolean restartLaserConnection()
+    {
+        device.setText(laser_name);
+        return restartDevice();
+    }
+    public boolean restartPowerConnection()
+    {
+        device.setText(power_name);
         return restartDevice();
     }
 

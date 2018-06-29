@@ -25,6 +25,8 @@ public class Initializer {
     }
 
     public static void fullClose() {
+        //$
+        /*
         try {
             Laser.sendCommand(LaserCommands.closeShutter());
         } catch (Exception e) {
@@ -35,6 +37,7 @@ public class Initializer {
         } catch (Exception e) {
             ErrorProcessor.standartError("Fail to activate laser stand-by mode", e);
         }
+        */
         try {
             Power.sendCommand(PowerSupplyCommands.switchOff());
         } catch (Exception e) {

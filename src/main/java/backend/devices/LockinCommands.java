@@ -48,7 +48,7 @@ There is no checksum!
         return "LOCL 0";
     }
 
-    public static String getRefFreq() {
-        return "SNAP?9";
+    public static String getOutputXF() {
+        return "SNAP?1,9";
     }
 }

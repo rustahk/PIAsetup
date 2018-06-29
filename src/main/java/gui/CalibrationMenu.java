@@ -21,6 +21,7 @@ public class CalibrationMenu {
     private static String error_title = "Calibration error";
 
     public static void openDialog() {
+
         dialog = new TextInputDialog("Calibration");
         result = dialog.showAndWait();
         try {

@@ -230,10 +230,12 @@ public class Connection {
     }
 
     public static void cleanConnections() {
-        for (Connection i : connections) {
-            if (i != null && i.isOpened()) {
+        while(connections.size()!=0)
+        {
+            Connection c = connections.poll();
+            if (c!= null && c.isOpened()){
                 try {
-                    i.disconnect();
+                    c.disconnect();
                 } catch (Exception e) {
                     ErrorProcessor.standartError("Fail to close connection", e);
                 }
@@ -259,6 +261,10 @@ public class Connection {
 
     public int getResponcedelay() {
         return responcedelay;
+    }
+
+    public SerialPort getPort() {
+        return port;
     }
 }
 

@@ -23,7 +23,6 @@ public class Laser implements Connectable {
             ErrorProcessor.standartError("Laser connection problem", e);
             throw e;
         }
-
         return laser.connection.getStringResponce();
     }
 
@@ -49,5 +48,16 @@ public class Laser implements Connectable {
 
     public Connection getConnection() {
         return connection;
+    }
+
+    public static String askID() throws Exception {
+        int[] i = new int[5];
+        i[0] = 0x3f;
+        i[1] = 0x49;
+        i[2] = 0x44;
+        i[3] = 0x4e;
+        i[4] = 0x0d;
+        laser.connection.sendMessage(i);
+        return laser.connection.getStringResponce();
     }
 }
